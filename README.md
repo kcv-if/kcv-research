@@ -36,3 +36,4 @@ chown -R www-data:www-data storage
 php artisan key:generate
 ```
 * Open the website on `http://localhost:8088/`
+* Execute the command `php artisan migrate:fresh --seed` to fresh migrate and seed the database
