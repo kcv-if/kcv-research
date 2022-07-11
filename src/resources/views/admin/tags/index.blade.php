@@ -5,6 +5,13 @@
   <h1 class="h2">Tags</h1>
 </div>
 
+@if(session()->has('error'))
+<div class="alert alert-danger alert-dismissible fade show d-block w-50" role="alert">
+  {{ session('error') }}
+  <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+</div>
+@endif
+
 {{-- Create --}}
 <a href="{{ url('/admin/tags/create') }}" class="btn badge bg-success"><i class="bi bi-plus-circle"></i> Create</a>
 

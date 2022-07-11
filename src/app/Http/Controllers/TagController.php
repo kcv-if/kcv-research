@@ -57,6 +57,10 @@ class TagController extends Controller
     public function show($id)
     {
         $tag = Tag::find($id);
+        if(!$tag) {
+            return back()->with('error', 'Tag with id '. $id . ' not found');
+        }
+
         return view('admin.tags.show', [
             'title' => 'Tags',
             'tag' => $tag
@@ -66,6 +70,10 @@ class TagController extends Controller
     public function show_publications($id)
     {
         $tag = Tag::find($id);
+        if(!$tag) {
+            return back()->with('error', 'Tag with id '. $id . ' not found');
+        }
+
         return view('admin.tags.show_publications', [
             'title' => 'Tags',
             'tag' => $tag,
@@ -76,6 +84,10 @@ class TagController extends Controller
     public function show_datasets($id)
     {
         $tag = Tag::find($id);
+        if(!$tag) {
+            return back()->with('error', 'Tag with id '. $id . ' not found');
+        }
+
         return view('admin.tags.show_datasets', [
             'title' => 'Tags',
             'tag' => $tag,
@@ -92,6 +104,10 @@ class TagController extends Controller
     public function edit($id)
     {
         $tag = Tag::find($id);
+        if(!$tag) {
+            return back()->with('error', 'Tag with id '. $id . ' not found');
+        }
+
         return view('admin.tags.update', [
             'title' => 'Update Tag',
             'tag' => $tag
@@ -108,6 +124,10 @@ class TagController extends Controller
     public function update(Request $request, $id)
     {
         $tag = Tag::find($id);
+        if(!$tag) {
+            return back()->with('error', 'Tag with id '. $id . ' not found');
+        }
+
         $validated = $request->validate([
             'name' => 'required|unique:tags'
         ]);
@@ -123,7 +143,13 @@ class TagController extends Controller
      */
     public function destroy($id)
     {
+        $tag = Tag::find($id);
+        if(!$tag) {
+            return back()->with('error', 'Tag with id '. $id . ' not found');
+        }
+
         Tag::destroy($id);
+        
         return redirect('/admin/tags');
     }
 }
