@@ -15,8 +15,8 @@ return new class extends Migration
     {
         Schema::create('user_datasets', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('user_id');
-            $table->foreignId('dataset_id');
+            $table->foreignId('user_id')->references('id')->on('users')->onDelete('cascade');
+            $table->foreignId('dataset_id')->references('id')->on('datasets')->onDelete('cascade');
             $table->boolean('is_review')->default(false);
             $table->timestamps();
         });

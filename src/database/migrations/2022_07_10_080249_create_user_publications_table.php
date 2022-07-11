@@ -15,8 +15,8 @@ return new class extends Migration
     {
         Schema::create('user_publications', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('user_id');
-            $table->foreignId('publication_id');
+            $table->foreignId('user_id')->references('id')->on('users')->onDelete('cascade');
+            $table->foreignId('publication_id')->references('id')->on('publications')->onDelete('cascade');
             $table->boolean('is_review')->default(false);
             $table->timestamps();
         });

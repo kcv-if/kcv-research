@@ -15,7 +15,7 @@ return new class extends Migration
     {
         Schema::create('dataset_tags', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('dataset_id');
+            $table->foreignId('dataset_id')->references('id')->on('datasets')->onDelete('cascade');
             $table->foreignId('tag_id')->references('id')->on('tags')->onDelete('cascade');
             $table->timestamps();
         });
