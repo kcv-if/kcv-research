@@ -33,7 +33,7 @@
             @csrf
             @method('delete')
             <button type="submit" class="btn badge bg-danger"><i class="bi bi-x-circle"></i></button>
-        </form>
+          </form>
         </td>
       </tr>
     @endforeach

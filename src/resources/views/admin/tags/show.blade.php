@@ -14,6 +14,12 @@
   <p>Updated at: {{ $tag->updated_at }}</p>
   <a href="/admin/tags/{{ $tag->id }}/publications">Publications</a>
   <a href="/admin/tags/{{ $tag->id }}/datasets">Datasets</a>
+  {{-- Delete --}}
+  <form method="post" class="d-inline" action="/admin/tags/{{ $tag->id }}">
+    @csrf
+    @method('delete')
+    <button type="submit" class="btn badge bg-danger"><i class="bi bi-x-circle"></i></button>
+  </form>
 </div>
 
 @endsection
