@@ -50,7 +50,31 @@ class TagController extends Controller
      */
     public function show($id)
     {
-        //
+        $tag = Tag::find($id);
+        return view('admin.tags.show', [
+            'title' => 'Tags',
+            'tag' => $tag
+        ]);
+    }
+
+    public function show_publications($id)
+    {
+        $tag = Tag::find($id);
+        return view('admin.tags.show_publications', [
+            'title' => 'Tags',
+            'tag' => $tag,
+            'publications' => $tag->publications
+        ]);
+    }
+
+    public function show_datasets($id)
+    {
+        $tag = Tag::find($id);
+        return view('admin.tags.show_datasets', [
+            'title' => 'Tags',
+            'tag' => $tag,
+            'datasets' => $tag->datasets
+        ]);
     }
 
     /**

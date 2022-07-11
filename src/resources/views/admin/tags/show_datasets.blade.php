@@ -2,31 +2,27 @@
 
 @section('container')
 <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
-  <h1 class="h2">Tags</h1>
+  <h1 class="h2">Datasets with Tag "{{ $tag->name }}"</h1>
 </div>
 
-{{-- Create --}}
-<a href="{{ url('/admin/tags/create') }}" class="btn badge bg-success"><i class="bi bi-plus-circle"></i> Create</a>
+<a href="/admin/tags/{{ $tag->id }}" class="btn btn-link ml-0"><i class="bi bi-arrow-left"></i> Back</a>
 
+{{-- Create --}}
 <table class="table">
   <thead>
     <tr>
       <th scope="col">#</th>
       <th scope="col">Name</th>
-      <th scope="col">Actions</th>
     </tr>
   </thead>
   <tbody>
-    @foreach ($tags as $tag)
+    @foreach ($datasets as $dataset)
       <tr>
         <td>{{ $loop->iteration }}</td>
-        <td>{{ $tag->name }}</td>
-        <td>
-          {{-- Show --}}
-          <a href="/admin/tags/{{ $tag->id }}" class="badge bg-info"><i class="bi bi-eye"></i></a>
-        </td>
+        <td>{{ $dataset->name }}</td>
       </tr>
     @endforeach
   </tbody>
 </table>
+
 @endsection
