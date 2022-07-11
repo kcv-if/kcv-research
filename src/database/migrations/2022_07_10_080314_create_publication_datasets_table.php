@@ -15,8 +15,8 @@ return new class extends Migration
     {
         Schema::create('publication_datasets', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('publication_id');
-            $table->foreignId('dataset_id');
+            $table->foreignId('publication_id')->references('id')->on('publications')->onDelete('cascade');
+            $table->foreignId('dataset_id')->references('id')->on('datasets')->onDelete('cascade');
             $table->timestamps();
         });
     }
