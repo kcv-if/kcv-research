@@ -133,7 +133,9 @@ class TagController extends Controller
         $validated = $request->validate([
             'name' => 'required|unique:tags'
         ]);
-        Tag::where('id', $id)->update($validated);
+        if(!Tag::where('id', $id)->update($validated)) {
+            return back()->with('error', 'Unable to update tag "' . $validated['name'] . '"');
+        }
         return redirect('/admin/tags');
     }
 
