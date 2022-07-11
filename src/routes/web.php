@@ -35,6 +35,7 @@ Route::prefix('admin')->group(function () {
     Route::get('/tags/{id}/datasets', [TagController::class, 'show_datasets']);
     Route::post('/tags', [TagController::class, 'store']);
     Route::put('/tags/{id}', [TagController::class, 'update']);
+    Route::delete('/tags/{id}', [TagController::class, 'destroy']);
 
     Route::get('/users', function () {
         return view('admin.users.index', ['title' => 'Users']);

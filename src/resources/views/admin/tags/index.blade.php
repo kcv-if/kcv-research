@@ -27,6 +27,13 @@
 
           {{-- Update --}}
           <a href="/admin/tags/{{ $tag->id }}/edit" class="badge bg-warning"><i class="bi bi-pencil-square"></i></a>
+        
+          {{-- Delete --}}
+          <form method="post" class="d-inline" action="/admin/tags/{{ $tag->id }}">
+            @csrf
+            @method('delete')
+            <button type="submit" class="btn badge bg-danger"><i class="bi bi-x-circle"></i></button>
+        </form>
         </td>
       </tr>
     @endforeach
