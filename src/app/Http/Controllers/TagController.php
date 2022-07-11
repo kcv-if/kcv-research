@@ -28,7 +28,9 @@ class TagController extends Controller
      */
     public function create()
     {
-        //
+        return view('admin.tags.create', [
+            'title' => 'Create Tag'
+        ]);
     }
 
     /**
@@ -39,7 +41,11 @@ class TagController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $validated = $request->validate([
+            'name' => 'required|unique:tags'
+        ]);
+        Tag::create($validated);
+        return redirect('/admin/tags');
     }
 
     /**
