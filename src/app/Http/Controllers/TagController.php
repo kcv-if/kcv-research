@@ -44,7 +44,9 @@ class TagController extends Controller
         $validated = $request->validate([
             'name' => 'required|unique:tags'
         ]);
-        Tag::create($validated);
+        if(!Tag::create($validated)) {
+            return back()->with('error', 'Unable to create tag "' . $validated['name'] . '"');
+        }
         return redirect('/admin/tags');
     }
 
