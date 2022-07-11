@@ -16,7 +16,7 @@
     </tr>
   </thead>
   <tbody>
-    @foreach ($publications as $publication)
+    @foreach ($tag->publications as $publication)
       <tr>
         <td>{{ $loop->iteration }}</td>
         <td>{{ $publication->name }}</td>

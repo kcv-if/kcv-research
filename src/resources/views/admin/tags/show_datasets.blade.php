@@ -16,7 +16,7 @@
     </tr>
   </thead>
   <tbody>
-    @foreach ($datasets as $dataset)
+    @foreach ($tag->datasets as $dataset)
       <tr>
         <td>{{ $loop->iteration }}</td>
         <td>{{ $dataset->name }}</td>

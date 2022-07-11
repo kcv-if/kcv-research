@@ -78,8 +78,7 @@ class TagController extends Controller
 
         return view('admin.tags.show_publications', [
             'title' => 'Tags',
-            'tag' => $tag,
-            'publications' => $tag->publications
+            'tag' => $tag
         ]);
     }
 
@@ -92,8 +91,7 @@ class TagController extends Controller
 
         return view('admin.tags.show_datasets', [
             'title' => 'Tags',
-            'tag' => $tag,
-            'datasets' => $tag->datasets
+            'tag' => $tag
         ]);
     }
 
