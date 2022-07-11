@@ -14,6 +14,10 @@
   <p>Updated at: {{ $tag->updated_at }}</p>
   <a href="/admin/tags/{{ $tag->id }}/publications">Publications</a>
   <a href="/admin/tags/{{ $tag->id }}/datasets">Datasets</a>
+
+  {{-- Update --}}
+  <a href="/admin/tags/{{ $tag->id }}/edit" class="badge bg-warning"><i class="bi bi-pencil-square"></i></a>
+
   {{-- Delete --}}
   <form method="post" class="d-inline" action="/admin/tags/{{ $tag->id }}">
     @csrf
