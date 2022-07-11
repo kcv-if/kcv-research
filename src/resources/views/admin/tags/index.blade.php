@@ -24,6 +24,9 @@
         <td>
           {{-- Show --}}
           <a href="/admin/tags/{{ $tag->id }}" class="badge bg-info"><i class="bi bi-eye"></i></a>
+
+          {{-- Update --}}
+          <a href="/admin/tags/{{ $tag->id }}/edit" class="badge bg-warning"><i class="bi bi-pencil-square"></i></a>
         </td>
       </tr>
     @endforeach

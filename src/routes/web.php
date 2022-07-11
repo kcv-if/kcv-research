@@ -30,9 +30,11 @@ Route::prefix('admin')->group(function () {
     Route::get('/tags', [TagController::class, 'index']);
     Route::get('/tags/create', [TagController::class, 'create']);
     Route::get('/tags/{id}', [TagController::class, 'show']);
+    Route::get('/tags/{id}/edit', [TagController::class, 'edit']);
     Route::get('/tags/{id}/publications', [TagController::class, 'show_publications']);
     Route::get('/tags/{id}/datasets', [TagController::class, 'show_datasets']);
     Route::post('/tags', [TagController::class, 'store']);
+    Route::put('/tags/{id}', [TagController::class, 'update']);
 
     Route::get('/users', function () {
         return view('admin.users.index', ['title' => 'Users']);

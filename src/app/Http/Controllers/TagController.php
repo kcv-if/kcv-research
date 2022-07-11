@@ -91,7 +91,11 @@ class TagController extends Controller
      */
     public function edit($id)
     {
-        //
+        $tag = Tag::find($id);
+        return view('admin.tags.update', [
+            'title' => 'Update Tag',
+            'tag' => $tag
+        ]);
     }
 
     /**
@@ -103,7 +107,12 @@ class TagController extends Controller
      */
     public function update(Request $request, $id)
     {
-        //
+        $tag = Tag::find($id);
+        $validated = $request->validate([
+            'name' => 'required|unique:tags'
+        ]);
+        Tag::where('id', $id)->update($validated);
+        return redirect('/admin/tags');
     }
 
     /**
