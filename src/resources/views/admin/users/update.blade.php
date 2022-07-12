@@ -25,7 +25,7 @@
   {{-- Password --}}
   <div class="mb-3">
     <label for="password" class="form-label">Password</label>
-    <input type="text" class="form-control" id="password" name="password" placeholder="Password" required>
+    <input type="text" class="form-control" id="password" name="password" placeholder="Password">
   </div>
 
   {{-- Telephone --}}

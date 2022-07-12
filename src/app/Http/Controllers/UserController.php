@@ -156,17 +156,28 @@ class UserController extends Controller
         $validation_rules = [
             'name' => 'required',
             'email' => ['required', 'email:rfc,dns'],
-            'password' => 'required|min:6',
+            'password' => [],
             'telephone' => 'required|numeric',
         ];
 
+        // if email is different, then check if it is unique
         if ($request->input('email') !== $user->email) {
             $validation_rules['email'] = ['required', 'email:rfc,dns', 'unique:users'];
         }
 
+        // if request has password, then validate
+        if ($request->input('password')) {
+            $validation_rules['password'] = ['min:6'];
+        }
+
         $validated = $request->validate($validation_rules);
 
-        $validated['password'] = Hash::make($validated['password']);
+        // if request has password, then hash, else delete password element
+        if ($validated['password']) {
+            $validated['password'] = Hash::make($validated['password']);
+        } else {
+            unset($validated['password']);
+        }
 
         if(!User::where('id', $id)->update($validated)) {
             return back()->with('error', 'Unable to update user "' . $validated['name'] . '"');
