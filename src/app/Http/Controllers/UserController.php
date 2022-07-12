@@ -8,6 +8,8 @@ use Illuminate\Validation\Rule;
 
 class UserController extends Controller
 {
+    public static $user_roles = ['a' => 'Admin', 'u' => 'User'];
+
     /**
      * Display a listing of the resource.
      *
@@ -63,7 +65,55 @@ class UserController extends Controller
      */
     public function show($id)
     {
-        //
+        $user = User::find($id);
+        if(!$user) {
+            return back()->with('error', 'User with id '. $id . ' not found');
+        }
+
+        $user->role = self::$user_roles[$user->role];
+
+        return view('admin.users.show', [
+            'title' => 'User\'s Details',
+            'user' => $user
+        ]);
+    }
+
+    public function show_publications($id)
+    {
+        $user = User::find($id);
+        if(!$user) {
+            return back()->with('error', 'User with id '. $id . ' not found');
+        }
+
+        $publications = $user->publications;
+        if($user->role === 'a') {
+            $publications = $user->reviewed_publications;
+        }
+
+        return view('admin.users.show_publications', [
+            'title' => 'User\'s Publications',
+            'user' => $user,
+            'publications' => $publications
+        ]);
+    }
+
+    public function show_datasets($id)
+    {
+        $user = User::find($id);
+        if(!$user) {
+            return back()->with('error', 'User with id '. $id . ' not found');
+        }
+
+        $datasets = $user->datasets;
+        if($user->role === 'a') {
+            $datasets = $user->reviewed_datasets;
+        }
+
+        return view('admin.users.show_datasets', [
+            'title' => 'User\'s Datasets',
+            'user' => $user,
+            'datasets' => $datasets
+        ]);
     }
 
     /**
