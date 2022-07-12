@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\TagController;
+use App\Http\Controllers\UserController;
 
 /*
 |--------------------------------------------------------------------------
@@ -27,6 +28,7 @@ Route::prefix('admin')->group(function () {
         return view('admin.datasets.index', ['title' => 'Datasets']);
     });
 
+    // Tags
     Route::get('/tags', [TagController::class, 'index']);
     Route::get('/tags/create', [TagController::class, 'create']);
     Route::get('/tags/{id}', [TagController::class, 'show']);
@@ -37,9 +39,8 @@ Route::prefix('admin')->group(function () {
     Route::put('/tags/{id}', [TagController::class, 'update']);
     Route::delete('/tags/{id}', [TagController::class, 'destroy']);
 
-    Route::get('/users', function () {
-        return view('admin.users.index', ['title' => 'Users']);
-    });
+    // Users
+    Route::get('/users', [UserController::class, 'index']);
 });
 
 Route::redirect('/admin', '/admin/publications');
