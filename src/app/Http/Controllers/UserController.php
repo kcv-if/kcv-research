@@ -182,6 +182,13 @@ class UserController extends Controller
      */
     public function destroy($id)
     {
-        //
+        $user = User::find($id);
+        if(!$user) {
+            return back()->with('error', 'User with id '. $id . ' not found');
+        }
+
+        User::destroy($id);
+        
+        return redirect('/admin/users');
     }
 }

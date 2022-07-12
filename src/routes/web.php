@@ -48,6 +48,7 @@ Route::prefix('admin')->group(function () {
     Route::get('/users/{id}/datasets', [UserController::class, 'show_datasets']);
     Route::post('/users', [UserController::class, 'store']);
     Route::put('/users/{id}', [UserController::class, 'update']);
+    Route::delete('/users/{id}', [UserController::class, 'destroy']);
 });
 
 Route::redirect('/admin', '/admin/publications');
