@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\User;
+use Illuminate\Validation\Rule;
 
 class UserController extends Controller
 {
@@ -28,7 +29,9 @@ class UserController extends Controller
      */
     public function create()
     {
-        //
+        return view('admin.users.create', [
+            'title' => 'Create User'
+        ]);
     }
 
     /**
@@ -39,7 +42,17 @@ class UserController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $validated = $request->validate([
+            'role' => ['required', Rule::in(['u', 'a'])],
+            'name' => 'required',
+            'email' => 'required|email:rfc,dns|unique:users',
+            'password' => 'required|min:6',
+            'telephone' => 'required|numeric',
+        ]);
+        if(!User::create($validated)) {
+            return back()->with('error', 'Unable to create user "' . $validated['name'] . '"');
+        }
+        return redirect('/admin/users');
     }
 
     /**
