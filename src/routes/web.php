@@ -55,6 +55,8 @@ Route::prefix('admin')->group(function () {
     Route::get('/publications', [PublicationController::class, 'index']);
 
     Route::get('/publications/{id}', [PublicationController::class, 'show']);
+
+    Route::delete('/publications/{id}', [PublicationController::class, 'destroy']);
 });
 
 Route::redirect('/admin', '/admin/publications');

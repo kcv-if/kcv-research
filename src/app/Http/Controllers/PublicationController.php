@@ -92,6 +92,13 @@ class PublicationController extends Controller
      */
     public function destroy($id)
     {
-        //
+        $publication = Publication::find($id);
+        if(!$publication) {
+            return back()->with('error', 'Publication with id '. $id . ' not found');
+        }
+
+        publication::destroy($id);
+        
+        return redirect('/admin/publications');
     }
 }
