@@ -8,4 +8,12 @@ use Illuminate\Database\Eloquent\Model;
 class Publication extends Model
 {
     use HasFactory;
+
+    protected $fillable = [
+        'name',
+        'excerpt',
+        'abstract',
+        'download_link',
+        'status'
+    ];
 }
