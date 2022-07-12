@@ -43,9 +43,11 @@ Route::prefix('admin')->group(function () {
     Route::get('/users', [UserController::class, 'index']);
     Route::get('/users/create', [UserController::class, 'create']);
     Route::get('/users/{id}', [UserController::class, 'show']);
+    Route::get('/users/{id}/edit', [UserController::class, 'edit']);
     Route::get('/users/{id}/publications', [UserController::class, 'show_publications']);
     Route::get('/users/{id}/datasets', [UserController::class, 'show_datasets']);
     Route::post('/users', [UserController::class, 'store']);
+    Route::put('/users/{id}', [UserController::class, 'update']);
 });
 
 Route::redirect('/admin', '/admin/publications');
