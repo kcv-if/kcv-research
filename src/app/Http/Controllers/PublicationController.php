@@ -50,7 +50,15 @@ class PublicationController extends Controller
      */
     public function show($id)
     {
-        //
+        $publication = Publication::find($id);
+        if(!$publication) {
+            return back()->with('error', 'Publication with id '. $id . ' not found');
+        }
+
+        return view('admin.publications.show', [
+            'title' => 'Publication "' . $publication->name . '"',
+            'publication' => $publication
+        ]);
     }
 
     /**

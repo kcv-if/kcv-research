@@ -12,10 +12,10 @@ class Tag extends Model
     protected $fillable = ['name'];
 
     public function publications() {
-        return $this->belongsToMany(Publication::class, 'publication_tags');
+        return $this->belongsToMany(Publication::class, 'publication_tags', 'tag_id', 'publication_id');
     }
 
     public function datasets() {
-        return $this->belongsToMany(Dataset::class, 'dataset_tags');
+        return $this->belongsToMany(Dataset::class, 'dataset_tags', 'tag_id', 'dataset_id');
     }
 }

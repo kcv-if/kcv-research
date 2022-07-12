@@ -45,18 +45,18 @@ class User extends Authenticatable
     ];
 
     public function publications() {
-        return $this->belongsToMany(Publication::class, 'user_publications')->where('is_review', false);
+        return $this->belongsToMany(Publication::class, 'user_publications', 'user_id', 'publication_id')->where('is_review', false);
     }
 
     public function reviewed_publications() {
-        return $this->belongsToMany(Publication::class, 'user_publications')->where('is_review', true);
+        return $this->belongsToMany(Publication::class, 'user_publications', 'user_id', 'publication_id')->where('is_review', true);
     }
 
     public function datasets() {
-        return $this->belongsToMany(Dataset::class, 'user_datasets')->where('is_review', false);
+        return $this->belongsToMany(Dataset::class, 'user_datasets', 'user_id', 'dataset_id')->where('is_review', false);
     }
 
     public function reviewed_datasets() {
-        return $this->belongsToMany(Dataset::class, 'user_datasets')->where('is_review', true);
+        return $this->belongsToMany(Dataset::class, 'user_datasets', 'user_id', 'dataset_id')->where('is_review', true);
     }
 }

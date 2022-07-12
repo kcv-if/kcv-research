@@ -53,6 +53,8 @@ Route::prefix('admin')->group(function () {
 
     // Publications
     Route::get('/publications', [PublicationController::class, 'index']);
+
+    Route::get('/publications/{id}', [PublicationController::class, 'show']);
 });
 
 Route::redirect('/admin', '/admin/publications');

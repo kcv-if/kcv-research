@@ -18,6 +18,8 @@ return new class extends Migration
             $table->foreignId('user_id')->references('id')->on('users')->onDelete('cascade');
             $table->foreignId('publication_id')->references('id')->on('publications')->onDelete('cascade');
             $table->boolean('is_review')->default(false);
+            $table->text('review_comment')->nullable();
+            $table->timestamp('reviewed_at')->nullable();
             $table->timestamps();
         });
     }
