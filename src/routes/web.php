@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\TagController;
+use App\Http\Controllers\UserController;
 
 /*
 |--------------------------------------------------------------------------
@@ -27,6 +28,7 @@ Route::prefix('admin')->group(function () {
         return view('admin.datasets.index', ['title' => 'Datasets']);
     });
 
+    // Tags
     Route::get('/tags', [TagController::class, 'index']);
     Route::get('/tags/create', [TagController::class, 'create']);
     Route::get('/tags/{id}', [TagController::class, 'show']);
@@ -37,9 +39,16 @@ Route::prefix('admin')->group(function () {
     Route::put('/tags/{id}', [TagController::class, 'update']);
     Route::delete('/tags/{id}', [TagController::class, 'destroy']);
 
-    Route::get('/users', function () {
-        return view('admin.users.index', ['title' => 'Users']);
-    });
+    // Users
+    Route::get('/users', [UserController::class, 'index']);
+    Route::get('/users/create', [UserController::class, 'create']);
+    Route::get('/users/{id}', [UserController::class, 'show']);
+    Route::get('/users/{id}/edit', [UserController::class, 'edit']);
+    Route::get('/users/{id}/publications', [UserController::class, 'show_publications']);
+    Route::get('/users/{id}/datasets', [UserController::class, 'show_datasets']);
+    Route::post('/users', [UserController::class, 'store']);
+    Route::put('/users/{id}', [UserController::class, 'update']);
+    Route::delete('/users/{id}', [UserController::class, 'destroy']);
 });
 
 Route::redirect('/admin', '/admin/publications');

@@ -18,9 +18,11 @@ class User extends Authenticatable
      * @var array<int, string>
      */
     protected $fillable = [
+        'role',
         'name',
         'email',
         'password',
+        'telephone'
     ];
 
     /**
@@ -41,4 +43,20 @@ class User extends Authenticatable
     protected $casts = [
         'email_verified_at' => 'datetime',
     ];
+
+    public function publications() {
+        return $this->belongsToMany(Publication::class, 'user_publications')->where('is_review', false);
+    }
+
+    public function reviewed_publications() {
+        return $this->belongsToMany(Publication::class, 'user_publications')->where('is_review', true);
+    }
+
+    public function datasets() {
+        return $this->belongsToMany(Dataset::class, 'user_datasets')->where('is_review', false);
+    }
+
+    public function reviewed_datasets() {
+        return $this->belongsToMany(Dataset::class, 'user_datasets')->where('is_review', true);
+    }
 }
