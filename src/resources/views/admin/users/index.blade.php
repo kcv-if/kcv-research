@@ -13,6 +13,7 @@
     <tr>
       <th scope="col">#</th>
       <th scope="col">Name</th>
+      <th scope="col">Role</th>
       <th scope="col">Actions</th>
     </tr>
   </thead>
@@ -21,6 +22,13 @@
       <tr>
         <td>{{ $loop->iteration }}</td>
         <td>{{ $user->name }}</td>
+        <td>
+          @if($user->role === 'a')
+            Admin
+          @elseif($user->role === 'u')
+            User
+          @endif
+        </td>
         <td>
           {{-- Show --}}
           <a href="/admin/users/{{ $user->id }}" class="badge bg-info"><i class="bi bi-eye"></i></a>
