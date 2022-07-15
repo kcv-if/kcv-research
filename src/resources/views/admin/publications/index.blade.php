@@ -43,13 +43,17 @@
 
           {{-- Update --}}
           <a href="/admin/publications/{{ $publication->id }}/edit" class="badge bg-warning"><i class="bi bi-pencil-square"></i></a>
-        
+
           {{-- Delete --}}
           <form method="post" class="d-inline" action="/admin/publications/{{ $publication->id }}">
             @csrf
             @method('delete')
             <button type="submit" class="btn badge bg-danger"><i class="bi bi-x-circle"></i></button>
           </form>
+
+          {{-- Review --}}
+          <a href="/admin/publications/{{ $publication->id }}/review" class="badge bg-primary"><i class="bi bi-hand-thumbs-up"></i></a>
+
         </td>
       </tr>
     @endforeach

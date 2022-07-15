@@ -40,6 +40,9 @@ Route::prefix('admin')->group(function () {
     Route::put('/tags/{id}', [TagController::class, 'update']);
     Route::delete('/tags/{id}', [TagController::class, 'destroy']);
 
+    // Tags search by name
+    Route::post('/tags/search', [TagController::class, 'get_by_name'])->name('tags.search');
+
     // Users
     Route::get('/users', [UserController::class, 'index']);
     Route::get('/users/create', [UserController::class, 'create']);
@@ -51,8 +54,19 @@ Route::prefix('admin')->group(function () {
     Route::put('/users/{id}', [UserController::class, 'update']);
     Route::delete('/users/{id}', [UserController::class, 'destroy']);
 
+    // Users search by name
+    Route::post('/users/search', [UserController::class, 'get_by_email'])->name('users.search');
+
     // Publications
     Route::get('/publications', [PublicationController::class, 'index']);
+    Route::get('/publications/create', [PublicationController::class, 'create']);
+    Route::get('/publications/{id}', [PublicationController::class, 'show']);
+    Route::get('/publications/{id}/edit', [PublicationController::class, 'edit']);
+    Route::get('/publications/{id}/review', [PublicationController::class, 'create_review']);
+    Route::post('/publications/{id}/review', [PublicationController::class, 'store_review']);
+    Route::post('/publications', [PublicationController::class, 'store']);
+    Route::put('/publications/{id}', [PublicationController::class, 'update']);
+    Route::delete('/publications/{id}', [PublicationController::class, 'destroy']);
 });
 
 Route::redirect('/admin', '/admin/publications');
