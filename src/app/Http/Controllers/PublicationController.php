@@ -203,6 +203,8 @@ class PublicationController extends Controller
             return back()->with('error', 'Unable to update publication "' . $validated['name'] . '"');
         }
 
+        // todo: fix publication updated but author not updated (if failed)
+
         // Authors
         DB::table('user_publications')
             ->where('publication_id', $publication->id)
