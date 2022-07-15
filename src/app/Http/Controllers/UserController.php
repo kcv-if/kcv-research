@@ -199,7 +199,19 @@ class UserController extends Controller
         }
 
         User::destroy($id);
-        
+
         return redirect('/admin/users');
+    }
+
+    public function get_by_email(Request $request) {
+        if($request->keyword === '') {
+            return response()->json([], 200);
+        }
+
+        $users = User::where('role', '!=', 'a')->where('email', 'LIKE', '%' . $request->keyword . '%')->get();
+
+        return response()->json([
+            'users' => $users
+        ], 200);
     }
 }

@@ -151,7 +151,19 @@ class TagController extends Controller
         }
 
         Tag::destroy($id);
-        
+
         return redirect('/admin/tags');
+    }
+
+    public function get_by_name(Request $request) {
+        if($request->keyword === '') {
+            return response()->json([], 200);
+        }
+
+        $tags = Tag::where('name', 'LIKE', '%' . $request->keyword . '%')->get();
+
+        return response()->json([
+            'tags' => $tags
+        ], 200);
     }
 }
