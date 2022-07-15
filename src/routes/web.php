@@ -61,7 +61,11 @@ Route::prefix('admin')->group(function () {
     Route::get('/publications', [PublicationController::class, 'index']);
     Route::get('/publications/create', [PublicationController::class, 'create']);
     Route::get('/publications/{id}', [PublicationController::class, 'show']);
+    Route::get('/publications/{id}/edit', [PublicationController::class, 'edit']);
+    Route::get('/publications/{id}/review', [PublicationController::class, 'create_review']);
+    Route::post('/publications/{id}/review', [PublicationController::class, 'store_review']);
     Route::post('/publications', [PublicationController::class, 'store']);
+    Route::put('/publications/{id}', [PublicationController::class, 'update']);
     Route::delete('/publications/{id}', [PublicationController::class, 'destroy']);
 });
 
