@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\TagController;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\DatasetController;
 use App\Http\Controllers\PublicationController;
 
 /*
@@ -67,6 +68,17 @@ Route::prefix('admin')->group(function () {
     Route::post('/publications', [PublicationController::class, 'store']);
     Route::put('/publications/{id}', [PublicationController::class, 'update']);
     Route::delete('/publications/{id}', [PublicationController::class, 'destroy']);
+
+    // Dataset
+    Route::get('/datasets', [DatasetController::class, 'index']);
+    Route::get('/datasets/create', [DatasetController::class, 'create']);
+    Route::get('/datasets/{id}', [DatasetController::class, 'show']);
+    Route::get('/datasets/{id}/edit', [DatasetController::class, 'edit']);
+    Route::get('/datasets/{id}/review', [DatasetController::class, 'create_review']);
+    Route::post('/datasets/{id}/review', [DatasetController::class, 'store_review']);
+    Route::post('/datasets', [DatasetController::class, 'store']);
+    Route::put('/datasets/{id}', [DatasetController::class, 'update']);
+    Route::delete('/datasets/{id}', [DatasetController::class, 'destroy']);
 });
 
 Route::redirect('/admin', '/admin/publications');
