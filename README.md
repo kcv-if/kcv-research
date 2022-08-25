@@ -1,6 +1,9 @@
 # KCV Research
 KCV Research is a website to ~~flex~~ showcase publications and datasets made by ITS academics in the field of Intelligent Computing and Vision.
 
+## Database Design
+https://dbdiagram.io/d/6307927af1a9b01b0fe35328
+
 ## Requirements
 
 ### Install WSL (Windows)
