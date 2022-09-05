@@ -15,12 +15,12 @@ return new class extends Migration
     {
         Schema::create('publications', function (Blueprint $table) {
             $table->id();
+            $table->string('uuid')->unique();
             $table->string('name');
             $table->text('excerpt');
             $table->text('abstract');
             $table->string('download_link');
             $table->char('status', 1)->default('p');
-            $table->string('slug')->unique();
             $table->timestamps();
         });
     }

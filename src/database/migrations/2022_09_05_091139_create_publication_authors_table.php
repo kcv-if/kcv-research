@@ -13,14 +13,10 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('datasets', function (Blueprint $table) {
+        Schema::create('publication_authors', function (Blueprint $table) {
             $table->id();
-            $table->string('uuid')->unique();
-            $table->string('name');
-            $table->text('description');
-            $table->string('download_link');
-            $table->char('status', 1)->default('p');
-            $table->timestamps();
+            $table->foreignId('user_id')->references('id')->on('users')->onDelete('cascade');
+            $table->foreignId('publication_id')->references('id')->on('publications')->onDelete('cascade');
         });
     }
 
@@ -31,6 +27,6 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('datasets');
+        Schema::dropIfExists('publication_authors');
     }
 };

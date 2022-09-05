@@ -13,14 +13,10 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('user_datasets', function (Blueprint $table) {
+        Schema::create('dataset_authors', function (Blueprint $table) {
             $table->id();
             $table->foreignId('user_id')->references('id')->on('users')->onDelete('cascade');
             $table->foreignId('dataset_id')->references('id')->on('datasets')->onDelete('cascade');
-            $table->boolean('is_review')->default(false);
-            $table->text('review_comment')->nullable();
-            $table->timestamp('reviewed_at')->nullable();
-            $table->timestamps();
         });
     }
 
@@ -31,6 +27,6 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('user_datasets');
+        Schema::dropIfExists('dataset_authors');
     }
 };
