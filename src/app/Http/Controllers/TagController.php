@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Slices\Tag\Domain\IGetByUuidTagQuery;
 use App\Slices\Tag\UseCase\IGetAllTagUseCase;
 use App\Slices\Tag\UseCase\IStoreTagUseCase;
 use App\Slices\Tag\UseCase\StoreTagRequest;
@@ -12,7 +13,8 @@ class TagController extends Controller
 {
     public function __construct(
         private IGetAllTagUseCase $getAllTagUseCase,
-        private IStoreTagUseCase $storeTagUseCase
+        private IStoreTagUseCase $storeTagUseCase,
+        private IGetByUuidTagQuery $getByUuidTagQuery
     ) {
     }
 
@@ -36,7 +38,6 @@ class TagController extends Controller
         ]);
     }
 
-
     public function store(Request $request)
     {
         // $validated = $request->validate([
@@ -47,23 +48,22 @@ class TagController extends Controller
             $this->storeTagUseCase->execute(new StoreTagRequest($request->name));
             return redirect('/admin/tags');
         } catch (Exception $e) {
-            return back()->with('error', 'Unable to create tag "' . $request->name . '"');
+            return back()->with('error', $e->getMessage());
         }
     }
 
-
-    // public function show($id)
-    // {
-    //     $tag = Tag::find($id);
-    //     if (!$tag) {
-    //         return back()->with('error', 'Tag with id ' . $id . ' not found');
-    //     }
-
-    //     return view('admin.tags.show', [
-    //         'title' => 'Tags',
-    //         'tag' => $tag
-    //     ]);
-    // }
+    public function show($uuid)
+    {
+        try {
+            $response = $this->getByUuidTagQuery->execute($uuid);
+            return view('admin.tags.show', [
+                'title' => 'Tag',
+                'tag' => $response
+            ]);
+        } catch (Exception $e) {
+            return back()->with('error', $e->getMessage());
+        }
+    }
 
     // public function edit($id)
     // {

@@ -4,7 +4,6 @@ namespace App\Slices\Tag\Repository\MySql;
 
 use App\Slices\Tag\Domain\GetAllTagQueryOutputItem;
 use App\Slices\Tag\Domain\IGetAllTagQuery;
-use Exception;
 use Illuminate\Support\Facades\DB;
 
 class MySqlGetAllTagQuery implements IGetAllTagQuery

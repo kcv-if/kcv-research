@@ -14,5 +14,5 @@ class GetByUuidTagQueryOutput
 
 interface IGetByUuidTagQuery
 {
-    public function execute(): array;
+    public function execute(string $uuid): GetByUuidTagQueryOutput;
 }

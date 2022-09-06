@@ -2,7 +2,6 @@
 
 namespace App\Slices\Tag\UseCase;
 
-use App\Slices\Tag\Domain\IGetAllTagQuery;
 use App\Slices\Tag\Domain\IStoreTagCommand;
 use App\Slices\Tag\Domain\StoreTagCommandInput;
 use App\Slices\Tag\Domain\Tag;
@@ -32,10 +31,10 @@ class StoreTagUseCase implements IStoreTagUseCase
     public function execute(StoreTagRequest $request): void
     {
         try {
-            $user = new Tag(0, Uuid::uuid4(), $request->name);
+            $tag = new Tag(0, Uuid::uuid4(), $request->name);
             $this->storeTagCommand->execute(new StoreTagCommandInput(
-                $user->getUuid(),
-                $user->getName()
+                $tag->getUuid(),
+                $tag->getName()
             ));
         } catch (Exception $e) {
             throw new Exception("unable to store tag");
