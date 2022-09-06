@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\User;
 use App\Slices\User\UseCase\IGetAllUserUseCase;
+use App\Slices\User\UseCase\IStoreUserUseCase;
+use App\Slices\User\UseCase\StoreUserRequest;
 use Exception;
 use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\Hash;
@@ -13,6 +15,7 @@ class UserController extends Controller
 {
     public function __construct(
         private IGetAllUserUseCase $getAllUserUseCase,
+        private IStoreUserUseCase $storeUserUseCase
     ) {
     }
 
@@ -29,30 +32,28 @@ class UserController extends Controller
         }
     }
 
-    // public function create()
-    // {
-    //     return view('admin.users.create', [
-    //         'title' => 'Create User'
-    //     ]);
-    // }
+    public function create()
+    {
+        return view('admin.users.create', [
+            'title' => 'Create User'
+        ]);
+    }
 
-    // public function store(Request $request)
-    // {
-    //     $validated = $request->validate([
-    //         'role' => ['required', Rule::in(['u', 'a'])],
-    //         'name' => 'required',
-    //         'email' => 'required|email:rfc,dns|unique:users',
-    //         'password' => 'required|min:6',
-    //         'telephone' => 'required|numeric',
-    //     ]);
-
-    //     $validated['password'] = Hash::make($validated['password']);
-
-    //     if(!User::create($validated)) {
-    //         return back()->with('error', 'Unable to create user "' . $validated['name'] . '"');
-    //     }
-    //     return redirect('/admin/users');
-    // }
+    public function store(Request $request)
+    {
+        try {
+            $this->storeUserUseCase->execute(new StoreUserRequest(
+                $request->input('role'),
+                $request->input('name'),
+                $request->input('email'),
+                $request->input('password'),
+                $request->input('telephone')
+            ));
+            return redirect('/admin/users');
+        } catch (Exception $e) {
+            return back()->with('error', $e->getMessage());
+        }
+    }
 
     // public function show($id)
     // {

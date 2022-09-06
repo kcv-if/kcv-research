@@ -21,4 +21,39 @@ class User
         private DateTime $createdAt
     ) {
     }
+
+    public function getUuid(): string
+    {
+        return $this->uuid;
+    }
+
+    public function getRole(): string
+    {
+        return $this->role;
+    }
+
+    public function getName(): string
+    {
+        return $this->name;
+    }
+
+    public function getEmail(): string
+    {
+        return $this->email;
+    }
+
+    public function getPassword(): string
+    {
+        return $this->password;
+    }
+
+    public function getTelephone(): string
+    {
+        return $this->telephone;
+    }
+
+    public function getCreatedAt(): DateTime
+    {
+        return $this->createdAt;
+    }
 }
