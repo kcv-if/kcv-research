@@ -39,7 +39,7 @@ Route::prefix('admin')->group(function () {
     Route::get('/tags/{id}/datasets', [TagController::class, 'show_datasets']);
     Route::post('/tags', [TagController::class, 'store']);
     Route::put('/tags/{id}', [TagController::class, 'update']);
-    Route::delete('/tags/{id}', [TagController::class, 'destroy']);
+    Route::delete('/tags/{uuid}', [TagController::class, 'destroy']);
 
     // Tags search by name
     Route::post('/tags/search', [TagController::class, 'get_by_name'])->name('tags.search');

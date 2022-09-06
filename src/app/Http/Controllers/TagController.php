@@ -3,7 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Slices\Tag\Domain\IGetByUuidTagQuery;
+use App\Slices\Tag\UseCase\IDeleteTagUseCase;
 use App\Slices\Tag\UseCase\IGetAllTagUseCase;
+use App\Slices\Tag\UseCase\IGetByUuidTagUseCase;
 use App\Slices\Tag\UseCase\IStoreTagUseCase;
 use App\Slices\Tag\UseCase\StoreTagRequest;
 use Exception;
@@ -14,7 +16,8 @@ class TagController extends Controller
     public function __construct(
         private IGetAllTagUseCase $getAllTagUseCase,
         private IStoreTagUseCase $storeTagUseCase,
-        private IGetByUuidTagQuery $getByUuidTagQuery
+        private IGetByUuidTagUseCase $getByUuidTagUseCase,
+        private IDeleteTagUseCase $deleteTagUseCase,
     ) {
     }
 
@@ -55,7 +58,7 @@ class TagController extends Controller
     public function show($uuid)
     {
         try {
-            $response = $this->getByUuidTagQuery->execute($uuid);
+            $response = $this->getByUuidTagUseCase->execute($uuid);
             return view('admin.tags.show', [
                 'title' => 'Tag',
                 'tag' => $response
@@ -96,17 +99,15 @@ class TagController extends Controller
     // }
 
 
-    // public function destroy($id)
-    // {
-    //     $tag = Tag::find($id);
-    //     if (!$tag) {
-    //         return back()->with('error', 'Tag with id ' . $id . ' not found');
-    //     }
-
-    //     Tag::destroy($id);
-
-    //     return redirect('/admin/tags');
-    // }
+    public function destroy($uuid)
+    {
+        try {
+            $this->deleteTagUseCase->execute($uuid);
+            return redirect('/admin/tags');
+        } catch (Exception $e) {
+            return back()->with('error', $e->getMessage());
+        }
+    }
 
     // public function get_by_name(Request $request)
     // {
