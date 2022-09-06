@@ -7,7 +7,9 @@ use App\Models\User;
 use App\Slices\User\UseCase\IGetAllUserUseCase;
 use App\Slices\User\UseCase\IGetByUuidUserUseCase;
 use App\Slices\User\UseCase\IStoreUserUseCase;
+use App\Slices\User\UseCase\IUpdateUserUseCase;
 use App\Slices\User\UseCase\StoreUserRequest;
+use App\Slices\User\UseCase\UpdateUserRequest;
 use Exception;
 use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\Hash;
@@ -17,7 +19,8 @@ class UserController extends Controller
     public function __construct(
         private IGetAllUserUseCase $getAllUserUseCase,
         private IStoreUserUseCase $storeUserUseCase,
-        private IGetByUuidUserUseCase $getByUuidUserUseCase
+        private IGetByUuidUserUseCase $getByUuidUserUseCase,
+        private IUpdateUserUseCase $updateUserUseCase
     ) {
     }
 
@@ -108,57 +111,34 @@ class UserController extends Controller
     //     ]);
     // }
 
-    // public function edit($id)
-    // {
-    //     $user = User::find($id);
-    //     if(!$user) {
-    //         return back()->with('error', 'User with id '. $id . ' not found');
-    //     }
+    public function edit($uuid)
+    {
+        try {
+            $response = $this->getByUuidUserUseCase->execute($uuid);
+            return view('admin.users.update', [
+                'title' => 'Update User',
+                'user' => $response
+            ]);
+        } catch (Exception $e) {
+            return back()->with('error', $e->getMessage());
+        }
+    }
 
-    //     return view('admin.users.update', [
-    //         'title' => 'Update User',
-    //         'user' => $user
-    //     ]);
-    // }
-
-    // public function update(Request $request, $id)
-    // {
-    //     $user = User::find($id);
-    //     if(!$user) {
-    //         return back()->with('error', 'user with id '. $id . ' not found');
-    //     }
-
-    //     $validation_rules = [
-    //         'name' => 'required',
-    //         'email' => ['required', 'email:rfc,dns'],
-    //         'password' => [],
-    //         'telephone' => 'required|numeric',
-    //     ];
-
-    //     // if email is different, then check if it is unique
-    //     if ($request->input('email') !== $user->email) {
-    //         $validation_rules['email'] = ['required', 'email:rfc,dns', 'unique:users'];
-    //     }
-
-    //     // if request has password, then validate
-    //     if ($request->input('password')) {
-    //         $validation_rules['password'] = ['min:6'];
-    //     }
-
-    //     $validated = $request->validate($validation_rules);
-
-    //     // if request has password, then hash, else delete password element
-    //     if ($validated['password']) {
-    //         $validated['password'] = Hash::make($validated['password']);
-    //     } else {
-    //         unset($validated['password']);
-    //     }
-
-    //     if(!User::where('id', $id)->update($validated)) {
-    //         return back()->with('error', 'Unable to update user "' . $validated['name'] . '"');
-    //     }
-    //     return redirect('/admin/users');
-    // }
+    public function update(Request $request, $uuid)
+    {
+        try {
+            $this->updateUserUseCase->execute(new UpdateUserRequest(
+                $uuid,
+                $request->input('name'),
+                $request->input('email'),
+                $request->input('password'),
+                $request->input('telephone')
+            ));
+            return redirect('/admin/users');
+        } catch (Exception $e) {
+            return back()->with('error', $e->getMessage());
+        }
+    }
 
     // public function destroy($id)
     // {

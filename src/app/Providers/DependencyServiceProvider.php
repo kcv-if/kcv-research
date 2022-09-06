@@ -25,15 +25,19 @@ use App\Slices\Tag\UseCase\UpdateTagUseCase;
 use App\Slices\User\Domain\IGetAllUserQuery;
 use App\Slices\User\Domain\IGetByUuidUserQuery;
 use App\Slices\User\Domain\IStoreUserCommand;
+use App\Slices\User\Domain\IUpdateUserCommand;
 use App\Slices\User\Repository\MySql\MySqlGetAllUserQuery;
 use App\Slices\User\Repository\MySql\MySqlGetByUuidUserQuery;
 use App\Slices\User\Repository\MySql\MySqlStoreUserCommand;
+use App\Slices\User\Repository\MySql\MySqlUpdateUserCommand;
 use App\Slices\User\UseCase\GetAllUserUseCase;
 use App\Slices\User\UseCase\GetByUuidUserUseCase;
 use App\Slices\User\UseCase\IGetAllUserUseCase;
 use App\Slices\User\UseCase\IGetByUuidUserUseCase;
 use App\Slices\User\UseCase\IStoreUserUseCase;
+use App\Slices\User\UseCase\IUpdateUserUseCase;
 use App\Slices\User\UseCase\StoreUserUseCase;
+use App\Slices\User\UseCase\UpdateUserUseCase;
 use Illuminate\Support\ServiceProvider;
 
 class DependencyServiceProvider extends ServiceProvider
@@ -50,6 +54,7 @@ class DependencyServiceProvider extends ServiceProvider
         $this->app->bind(IGetAllUserQuery::class, MySqlGetAllUserQuery::class);
         $this->app->bind(IStoreUserCommand::class, MySqlStoreUserCommand::class);
         $this->app->bind(IGetByUuidUserQuery::class, MySqlGetByUuidUserQuery::class);
+        $this->app->bind(IUpdateUserCommand::class, MySqlUpdateUserCommand::class);
 
         // Use Case
 
@@ -61,5 +66,6 @@ class DependencyServiceProvider extends ServiceProvider
         $this->app->bind(IGetAllUserUseCase::class, GetAllUserUseCase::class);
         $this->app->bind(IStoreUserUseCase::class, StoreUserUseCase::class);
         $this->app->bind(IGetByUuidUserUseCase::class, GetByUuidUserUseCase::class);
+        $this->app->bind(IUpdateUserUseCase::class, UpdateUserUseCase::class);
     }
 }
