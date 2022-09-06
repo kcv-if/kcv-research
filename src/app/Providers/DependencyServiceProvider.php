@@ -22,6 +22,10 @@ use App\Slices\Tag\UseCase\IStoreTagUseCase;
 use App\Slices\Tag\UseCase\IUpdateTagUseCase;
 use App\Slices\Tag\UseCase\StoreTagUseCase;
 use App\Slices\Tag\UseCase\UpdateTagUseCase;
+use App\Slices\User\Domain\IGetAllUserQuery;
+use App\Slices\User\Repository\MySql\MySqlGetAllUserQuery;
+use App\Slices\User\UseCase\GetAllUserUseCase;
+use App\Slices\User\UseCase\IGetAllUserUseCase;
 use Illuminate\Support\ServiceProvider;
 
 class DependencyServiceProvider extends ServiceProvider
@@ -35,6 +39,7 @@ class DependencyServiceProvider extends ServiceProvider
         $this->app->bind(IGetByUuidTagQuery::class, MySqlGetByUuidTagQuery::class);
         $this->app->bind(IDeleteTagCommand::class, MySqlDeleteTagCommand::class);
         $this->app->bind(IUpdateTagCommand::class, MySqlUpdateTagCommand::class);
+        $this->app->bind(IGetAllUserQuery::class, MySqlGetAllUserQuery::class);
 
         // Use Case
 
@@ -43,5 +48,6 @@ class DependencyServiceProvider extends ServiceProvider
         $this->app->bind(IGetByUuidTagUseCase::class, GetByUuidTagUseCase::class);
         $this->app->bind(IDeleteTagUseCase::class, DeleteTagUseCase::class);
         $this->app->bind(IUpdateTagUseCase::class, UpdateTagUseCase::class);
+        $this->app->bind(IGetAllUserUseCase::class, GetAllUserUseCase::class);
     }
 }

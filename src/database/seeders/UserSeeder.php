@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use Carbon\Carbon;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use DB;
@@ -25,6 +26,7 @@ class UserSeeder extends Seeder
                 'email' => 'admin1@mail.com',
                 'password' => Hash::make('admin1'),
                 'telephone' => '1234567890',
+                'created_at' => Carbon::now()
             ],
             [
                 'uuid' => Uuid::uuid4(),
@@ -33,6 +35,7 @@ class UserSeeder extends Seeder
                 'email' => 'user1@mail.com',
                 'password' => Hash::make('user1'),
                 'telephone' => '1234567890',
+                'created_at' => Carbon::now()
             ],
             [
                 'uuid' => Uuid::uuid4(),
@@ -41,6 +44,7 @@ class UserSeeder extends Seeder
                 'email' => 'user2@mail.com',
                 'password' => Hash::make('user2'),
                 'telephone' => '1234567890',
+                'created_at' => Carbon::now()
             ],
         ]);
     }
