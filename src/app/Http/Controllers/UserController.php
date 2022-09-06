@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\User;
+use App\Slices\User\UseCase\IDeleteUserUseCase;
 use App\Slices\User\UseCase\IGetAllUserUseCase;
 use App\Slices\User\UseCase\IGetByUuidUserUseCase;
 use App\Slices\User\UseCase\IStoreUserUseCase;
@@ -20,7 +21,8 @@ class UserController extends Controller
         private IGetAllUserUseCase $getAllUserUseCase,
         private IStoreUserUseCase $storeUserUseCase,
         private IGetByUuidUserUseCase $getByUuidUserUseCase,
-        private IUpdateUserUseCase $updateUserUseCase
+        private IUpdateUserUseCase $updateUserUseCase,
+        private IDeleteUserUseCase $deleteUserUseCase
     ) {
     }
 
@@ -73,44 +75,6 @@ class UserController extends Controller
         }
     }
 
-    // public function show_publications($id)
-    // {
-    //     $user = User::find($id);
-    //     if(!$user) {
-    //         return back()->with('error', 'User with id '. $id . ' not found');
-    //     }
-
-    //     $publications = $user->publications;
-    //     if($user->role === 'a') {
-    //         $publications = $user->reviewed_publications;
-    //     }
-
-    //     return view('admin.users.show_publications', [
-    //         'title' => 'User\'s Publications',
-    //         'user' => $user,
-    //         'publications' => $publications
-    //     ]);
-    // }
-
-    // public function show_datasets($id)
-    // {
-    //     $user = User::find($id);
-    //     if(!$user) {
-    //         return back()->with('error', 'User with id '. $id . ' not found');
-    //     }
-
-    //     $datasets = $user->datasets;
-    //     if($user->role === 'a') {
-    //         $datasets = $user->reviewed_datasets;
-    //     }
-
-    //     return view('admin.users.show_datasets', [
-    //         'title' => 'User\'s Datasets',
-    //         'user' => $user,
-    //         'datasets' => $datasets
-    //     ]);
-    // }
-
     public function edit($uuid)
     {
         try {
@@ -140,17 +104,15 @@ class UserController extends Controller
         }
     }
 
-    // public function destroy($id)
-    // {
-    //     $user = User::find($id);
-    //     if(!$user) {
-    //         return back()->with('error', 'User with id '. $id . ' not found');
-    //     }
-
-    //     User::destroy($id);
-
-    //     return redirect('/admin/users');
-    // }
+    public function destroy($uuid)
+    {
+        try {
+            $this->deleteUserUseCase->execute($uuid);
+            return redirect('/admin/users');
+        } catch (Exception $e) {
+            return back()->with('error', $e->getMessage());
+        }
+    }
 
     // public function get_by_email(Request $request) {
     //     if($request->keyword === '') {

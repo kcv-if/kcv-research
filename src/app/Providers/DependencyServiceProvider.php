@@ -22,16 +22,20 @@ use App\Slices\Tag\UseCase\IStoreTagUseCase;
 use App\Slices\Tag\UseCase\IUpdateTagUseCase;
 use App\Slices\Tag\UseCase\StoreTagUseCase;
 use App\Slices\Tag\UseCase\UpdateTagUseCase;
+use App\Slices\User\Domain\IDeleteUserCommand;
 use App\Slices\User\Domain\IGetAllUserQuery;
 use App\Slices\User\Domain\IGetByUuidUserQuery;
 use App\Slices\User\Domain\IStoreUserCommand;
 use App\Slices\User\Domain\IUpdateUserCommand;
+use App\Slices\User\Repository\MySql\MySqlDeleteUserCommand;
 use App\Slices\User\Repository\MySql\MySqlGetAllUserQuery;
 use App\Slices\User\Repository\MySql\MySqlGetByUuidUserQuery;
 use App\Slices\User\Repository\MySql\MySqlStoreUserCommand;
 use App\Slices\User\Repository\MySql\MySqlUpdateUserCommand;
+use App\Slices\User\UseCase\DeleteUserUseCase;
 use App\Slices\User\UseCase\GetAllUserUseCase;
 use App\Slices\User\UseCase\GetByUuidUserUseCase;
+use App\Slices\User\UseCase\IDeleteUserUseCase;
 use App\Slices\User\UseCase\IGetAllUserUseCase;
 use App\Slices\User\UseCase\IGetByUuidUserUseCase;
 use App\Slices\User\UseCase\IStoreUserUseCase;
@@ -55,6 +59,7 @@ class DependencyServiceProvider extends ServiceProvider
         $this->app->bind(IStoreUserCommand::class, MySqlStoreUserCommand::class);
         $this->app->bind(IGetByUuidUserQuery::class, MySqlGetByUuidUserQuery::class);
         $this->app->bind(IUpdateUserCommand::class, MySqlUpdateUserCommand::class);
+        $this->app->bind(IDeleteUserCommand::class, MySqlDeleteUserCommand::class);
 
         // Use Case
 
@@ -67,5 +72,6 @@ class DependencyServiceProvider extends ServiceProvider
         $this->app->bind(IStoreUserUseCase::class, StoreUserUseCase::class);
         $this->app->bind(IGetByUuidUserUseCase::class, GetByUuidUserUseCase::class);
         $this->app->bind(IUpdateUserUseCase::class, UpdateUserUseCase::class);
+        $this->app->bind(IDeleteUserUseCase::class, DeleteUserUseCase::class);
     }
 }
