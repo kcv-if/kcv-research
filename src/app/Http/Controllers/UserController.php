@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\User;
 use App\Slices\User\UseCase\IGetAllUserUseCase;
+use App\Slices\User\UseCase\IGetByUuidUserUseCase;
 use App\Slices\User\UseCase\IStoreUserUseCase;
 use App\Slices\User\UseCase\StoreUserRequest;
 use Exception;
@@ -15,7 +16,8 @@ class UserController extends Controller
 {
     public function __construct(
         private IGetAllUserUseCase $getAllUserUseCase,
-        private IStoreUserUseCase $storeUserUseCase
+        private IStoreUserUseCase $storeUserUseCase,
+        private IGetByUuidUserUseCase $getByUuidUserUseCase
     ) {
     }
 
@@ -55,20 +57,18 @@ class UserController extends Controller
         }
     }
 
-    // public function show($id)
-    // {
-    //     $user = User::find($id);
-    //     if(!$user) {
-    //         return back()->with('error', 'User with id '. $id . ' not found');
-    //     }
-
-    //     $user->role = self::$user_roles[$user->role];
-
-    //     return view('admin.users.show', [
-    //         'title' => 'User\'s Details',
-    //         'user' => $user
-    //     ]);
-    // }
+    public function show($uuid)
+    {
+        try {
+            $response = $this->getByUuidUserUseCase->execute($uuid);
+            return view('admin.users.show', [
+                'title' => 'User\'s Details',
+                'user' => $response
+            ]);
+        } catch (Exception $e) {
+            return back()->with('error', $e->getMessage());
+        }
+    }
 
     // public function show_publications($id)
     // {

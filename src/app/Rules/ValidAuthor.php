@@ -17,12 +17,13 @@ class ValidAuthor implements InvokableRule
      */
     public function __invoke($attribute, $value, $fail)
     {
+        // TODO: move this to business layer
         $emails = array_unique(explode(' ', $value));
-        foreach($emails as $email) {
+        foreach ($emails as $email) {
             $user = User::where('email', $email)->first();
-            if(!$user) {
+            if (!$user) {
                 $fail('All authors must be registered first.');
-            } else if($user->role === 'a') {
+            } else if ($user->role === 'a') {
                 $fail('No author is an admin.');
             }
         }
