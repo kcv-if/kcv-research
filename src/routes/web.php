@@ -34,11 +34,9 @@ Route::prefix('admin')->group(function () {
     Route::get('/tags', [TagController::class, 'index']);
     Route::get('/tags/create', [TagController::class, 'create']);
     Route::get('/tags/{uuid}', [TagController::class, 'show']);
-    Route::get('/tags/{id}/edit', [TagController::class, 'edit']);
-    Route::get('/tags/{id}/publications', [TagController::class, 'show_publications']);
-    Route::get('/tags/{id}/datasets', [TagController::class, 'show_datasets']);
+    Route::get('/tags/{uuid}/edit', [TagController::class, 'edit']);
     Route::post('/tags', [TagController::class, 'store']);
-    Route::put('/tags/{id}', [TagController::class, 'update']);
+    Route::put('/tags/{uuid}', [TagController::class, 'update']);
     Route::delete('/tags/{uuid}', [TagController::class, 'destroy']);
 
     // Tags search by name

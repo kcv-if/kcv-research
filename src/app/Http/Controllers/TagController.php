@@ -7,7 +7,9 @@ use App\Slices\Tag\UseCase\IDeleteTagUseCase;
 use App\Slices\Tag\UseCase\IGetAllTagUseCase;
 use App\Slices\Tag\UseCase\IGetByUuidTagUseCase;
 use App\Slices\Tag\UseCase\IStoreTagUseCase;
+use App\Slices\Tag\UseCase\IUpdateTagUseCase;
 use App\Slices\Tag\UseCase\StoreTagRequest;
+use App\Slices\Tag\UseCase\UpdateTagRequest;
 use Exception;
 use Illuminate\Http\Request;
 
@@ -18,6 +20,7 @@ class TagController extends Controller
         private IStoreTagUseCase $storeTagUseCase,
         private IGetByUuidTagUseCase $getByUuidTagUseCase,
         private IDeleteTagUseCase $deleteTagUseCase,
+        private IUpdateTagUseCase $updateTagUseCase
     ) {
     }
 
@@ -43,10 +46,6 @@ class TagController extends Controller
 
     public function store(Request $request)
     {
-        // $validated = $request->validate([
-        //     'name' => 'required|unique:tags'
-        // ]);
-
         try {
             $this->storeTagUseCase->execute(new StoreTagRequest($request->name));
             return redirect('/admin/tags');
@@ -68,35 +67,32 @@ class TagController extends Controller
         }
     }
 
-    // public function edit($id)
-    // {
-    //     $tag = Tag::find($id);
-    //     if (!$tag) {
-    //         return back()->with('error', 'Tag with id ' . $id . ' not found');
-    //     }
+    public function edit($uuid)
+    {
+        try {
+            $response = $this->getByUuidTagUseCase->execute($uuid);
+            return view('admin.tags.update', [
+                'title' => 'Update Tag',
+                'tag' => $response
+            ]);
+        } catch (Exception $e) {
+            return back()->with('error', $e->getMessage());
+        }
+    }
 
-    //     return view('admin.tags.update', [
-    //         'title' => 'Update Tag',
-    //         'tag' => $tag
-    //     ]);
-    // }
 
-
-    // public function update(Request $request, $id)
-    // {
-    //     $tag = Tag::find($id);
-    //     if (!$tag) {
-    //         return back()->with('error', 'Tag with id ' . $id . ' not found');
-    //     }
-
-    //     $validated = $request->validate([
-    //         'name' => 'required|unique:tags'
-    //     ]);
-    //     if (!Tag::where('id', $id)->update($validated)) {
-    //         return back()->with('error', 'Unable to update tag "' . $validated['name'] . '"');
-    //     }
-    //     return redirect('/admin/tags');
-    // }
+    public function update(Request $request, $uuid)
+    {
+        try {
+            $this->updateTagUseCase->execute(new UpdateTagRequest(
+                $uuid,
+                $request->input("name")
+            ));
+            return redirect('/admin/tags');
+        } catch (Exception $e) {
+            return back()->with('error', $e->getMessage());
+        }
+    }
 
 
     public function destroy($uuid)

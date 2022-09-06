@@ -13,5 +13,5 @@ class UpdateTagCommandInput
 
 interface IUpdateTagCommand
 {
-    public function execute(UpdateTagCommandInput $input): bool;
+    public function execute(UpdateTagCommandInput $input): void;
 }
