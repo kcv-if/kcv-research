@@ -11,8 +11,6 @@
     <div class="container">
         <p>UUID: {{ $tag->uuid }}</p>
         <p>Name: {{ $tag->name }}</p>
-        <a href="/admin/tags/{{ $tag->uuid }}/publications">Publications</a>
-        <a href="/admin/tags/{{ $tag->uuid }}/datasets">Datasets</a>
 
         {{-- Update --}}
         <a href="/admin/tags/{{ $tag->uuid }}/edit" class="badge bg-warning"><i class="bi bi-pencil-square"></i></a>
