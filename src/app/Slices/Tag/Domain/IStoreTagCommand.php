@@ -13,5 +13,5 @@ class StoreTagCommandInput
 
 interface IStoreTagCommand
 {
-    public function execute(StoreTagCommandInput $input): bool;
+    public function execute(StoreTagCommandInput $input): void;
 }

@@ -3,40 +3,53 @@
 namespace App\Http\Controllers;
 
 use App\Slices\Tag\UseCase\IGetAllTagUseCase;
+use App\Slices\Tag\UseCase\IStoreTagUseCase;
+use App\Slices\Tag\UseCase\StoreTagRequest;
+use Exception;
+use Illuminate\Http\Request;
 
 class TagController extends Controller
 {
-    public function __construct(private IGetAllTagUseCase $getAllTagUseCase)
-    {
+    public function __construct(
+        private IGetAllTagUseCase $getAllTagUseCase,
+        private IStoreTagUseCase $storeTagUseCase
+    ) {
     }
 
     public function index()
     {
-        $response = $this->getAllTagUseCase->execute();
-        return view('admin.tags.index', [
-            'title' => 'Tags',
-            'tags' => $response
+        try {
+            $response = $this->getAllTagUseCase->execute();
+            return view('admin.tags.index', [
+                'title' => 'Tags',
+                'tags' => $response
+            ]);
+        } catch (Exception $e) {
+            // TODO: add exception handling
+        }
+    }
+
+    public function create()
+    {
+        return view('admin.tags.create', [
+            'title' => 'Create Tag'
         ]);
     }
 
-    // public function create()
-    // {
-    //     return view('admin.tags.create', [
-    //         'title' => 'Create Tag'
-    //     ]);
-    // }
 
+    public function store(Request $request)
+    {
+        // $validated = $request->validate([
+        //     'name' => 'required|unique:tags'
+        // ]);
 
-    // public function store(Request $request)
-    // {
-    //     $validated = $request->validate([
-    //         'name' => 'required|unique:tags'
-    //     ]);
-    //     if (!Tag::create($validated)) {
-    //         return back()->with('error', 'Unable to create tag "' . $validated['name'] . '"');
-    //     }
-    //     return redirect('/admin/tags');
-    // }
+        try {
+            $this->storeTagUseCase->execute(new StoreTagRequest($request->name));
+            return redirect('/admin/tags');
+        } catch (Exception $e) {
+            return back()->with('error', 'Unable to create tag "' . $request->name . '"');
+        }
+    }
 
 
     // public function show($id)

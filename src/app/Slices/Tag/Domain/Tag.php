@@ -10,4 +10,14 @@ class Tag
         private string $name,
     ) {
     }
+
+    public function getUuid(): string
+    {
+        return $this->uuid;
+    }
+
+    public function getName(): string
+    {
+        return $this->name;
+    }
 }
