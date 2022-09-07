@@ -2,6 +2,10 @@
 
 namespace App\Providers;
 
+use App\Slices\Publication\Domain\IGetAllPublicationQuery;
+use App\Slices\Publication\Repository\MySql\MySqlGetAllPublicationQuery;
+use App\Slices\Publication\UseCase\GetAllPublicationUseCase;
+use App\Slices\Publication\UseCase\IGetAllPublicationUseCase;
 use App\Slices\Tag\Domain\IDeleteTagCommand;
 use App\Slices\Tag\Domain\IGetAllTagQuery;
 use App\Slices\Tag\Domain\IGetByUuidTagQuery;
@@ -60,6 +64,7 @@ class DependencyServiceProvider extends ServiceProvider
         $this->app->bind(IGetByUuidUserQuery::class, MySqlGetByUuidUserQuery::class);
         $this->app->bind(IUpdateUserCommand::class, MySqlUpdateUserCommand::class);
         $this->app->bind(IDeleteUserCommand::class, MySqlDeleteUserCommand::class);
+        $this->app->bind(IGetAllPublicationQuery::class, MySqlGetAllPublicationQuery::class);
 
         // Use Case
 
@@ -73,5 +78,6 @@ class DependencyServiceProvider extends ServiceProvider
         $this->app->bind(IGetByUuidUserUseCase::class, GetByUuidUserUseCase::class);
         $this->app->bind(IUpdateUserUseCase::class, UpdateUserUseCase::class);
         $this->app->bind(IDeleteUserUseCase::class, DeleteUserUseCase::class);
+        $this->app->bind(IGetAllPublicationUseCase::class, GetAllPublicationUseCase::class);
     }
 }

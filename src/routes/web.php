@@ -55,7 +55,7 @@ Route::prefix('admin')->group(function () {
     // Route::post('/users/search', [UserController::class, 'get_by_email'])->name('users.search');
 
     // Publications
-    // Route::get('/publications', [PublicationController::class, 'index']);
+    Route::get('/publications', [PublicationController::class, 'index']);
     // Route::get('/publications/create', [PublicationController::class, 'create']);
     // Route::get('/publications/{id}', [PublicationController::class, 'show']);
     // Route::get('/publications/{id}/edit', [PublicationController::class, 'edit']);

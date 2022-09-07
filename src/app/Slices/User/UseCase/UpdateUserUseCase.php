@@ -58,7 +58,7 @@ class UpdateUserUseCase implements IUpdateUserUseCase
                 $request->telephone
             ));
         } catch (Exception $e) {
-            throw $e;
+            throw new Exception("unable to update user");
         }
     }
 }
