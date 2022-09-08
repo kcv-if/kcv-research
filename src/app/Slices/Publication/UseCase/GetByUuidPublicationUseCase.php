@@ -3,6 +3,7 @@
 namespace App\Slices\Publication\UseCase;
 
 use App\Slices\Publication\Domain\IGetAllPublicationAuthorQuery;
+use App\Slices\Publication\Domain\IGetAllPublicationTagQuery;
 use App\Slices\Publication\Domain\IGetByUuidPublicationQuery;
 use App\Slices\PublicationReview\Domain\IGetAllPublicationReviewQuery;
 use DateTime;
@@ -18,6 +19,7 @@ class GetByUuidPublicationResponse
         public string $downloadLink,
         public string $status,
         public array $authors,
+        public array $tags,
         public array $reviews,
         public DateTime $createdAt,
         public ?DateTime $updatedAt
@@ -49,6 +51,15 @@ class GetByUuidPublicationResponseReviewItem
     }
 }
 
+class GetByUuidPublicationResponseTagItem
+{
+    public function __construct(
+        public string $uuid,
+        public string $name
+    ) {
+    }
+}
+
 interface IGetByUuidPublicationUseCase
 {
     public function execute(string $uuid): GetByUuidPublicationResponse;
@@ -59,7 +70,8 @@ class GetByUuidPublicationUseCase implements IGetByUuidPublicationUseCase
     public function __construct(
         private IGetByUuidPublicationQuery $getByUuidPublicationQuery,
         private IGetAllPublicationAuthorQuery $getAllPublicationAuthorQuery,
-        private IGetAllPublicationReviewQuery $getAllPublicationReviewQuery
+        private IGetAllPublicationReviewQuery $getAllPublicationReviewQuery,
+        private IGetAllPublicationTagQuery $getAllPublicationTagQuery
     ) {
     }
 
@@ -101,6 +113,15 @@ class GetByUuidPublicationUseCase implements IGetByUuidPublicationUseCase
             );
         }
 
+        $tagRows = $this->getAllPublicationTagQuery->execute($row->id);
+        $tags = [];
+        foreach ($tagRows as $tr) {
+            $tags[] = new GetByUuidPublicationResponseTagItem(
+                $tr->uuid,
+                $tr->name
+            );
+        }
+
         return new GetByUuidPublicationResponse(
             $row->uuid,
             $row->name,
@@ -109,6 +130,7 @@ class GetByUuidPublicationUseCase implements IGetByUuidPublicationUseCase
             $row->downloadLink,
             $row->status,
             $authors,
+            $tags,
             $reviews,
             $row->createdAt,
             $row->updatedAt

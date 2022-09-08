@@ -60,7 +60,7 @@
     </table>
 
     {{-- Tags --}}
-    {{-- <table class="table">
+    <table class="table">
         <thead>
             <tr>
                 <th scope="col">Tag</th>
@@ -73,7 +73,7 @@
                 </tr>
             @endforeach
         </tbody>
-    </table> --}}
+    </table>
 
     {{-- Reviewers --}}
     <table class="table">
