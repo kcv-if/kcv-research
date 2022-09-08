@@ -7,6 +7,7 @@ use DateTime;
 class GetByUuidUserQueryOutput
 {
     public function __construct(
+        public bool $success,
         public int $id,
         public string $uuid,
         public string $role,
@@ -14,7 +15,7 @@ class GetByUuidUserQueryOutput
         public string $email,
         public string $password,
         public string $telephone,
-        public DateTime $createdAt
+        public ?DateTime $createdAt
     ) {
     }
 }

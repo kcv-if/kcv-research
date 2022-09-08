@@ -21,11 +21,19 @@ class DeleteUserUseCase implements IDeleteUserUseCase
 
     public function execute(string $uuid): void
     {
+        $row = null;
+
         try {
             $row = $this->getByUuidUserQuery->execute($uuid);
-            if (!$row) {
-                throw new Exception("user not found");
-            }
+        } catch (Exception $e) {
+            throw new Exception("unable to get user by uuid");
+        }
+
+        if (!$row->success) {
+            throw new Exception("user not found");
+        }
+
+        try {
             $this->deleteUserCommand->execute($row->id);
         } catch (Exception $e) {
             throw new Exception("unable to delete user");

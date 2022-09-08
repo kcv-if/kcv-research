@@ -18,7 +18,7 @@ class User
         private array $publicationReviews = [],
         private array $datasets = [],
         private array $datasetReviews = [],
-        private DateTime $createdAt
+        private ?DateTime $createdAt
     ) {
     }
 

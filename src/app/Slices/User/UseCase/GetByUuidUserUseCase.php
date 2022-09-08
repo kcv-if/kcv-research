@@ -34,22 +34,26 @@ class GetByUuidUserUseCase implements IGetByUuidUserUseCase
 
     public function execute(string $uuid): GetByUuidUserResponse
     {
+        $row = null;
+
         try {
             $row = $this->getByUuidUserQuery->execute($uuid);
-            if (!$row) {
-                throw new Exception("user not found");
-            }
-            return new GetByUuidUserResponse(
-                $row->uuid,
-                $row->role,
-                $row->name,
-                $row->email,
-                $row->password,
-                $row->telephone,
-                $row->createdAt
-            );
         } catch (Exception $e) {
-            throw new Exception("unable get user by uuid");
+            throw new Exception("unable to get user by uuid");
         }
+
+        if (!$row->success) {
+            throw new Exception("user not found");
+        }
+
+        return new GetByUuidUserResponse(
+            $row->uuid,
+            $row->role,
+            $row->name,
+            $row->email,
+            $row->password,
+            $row->telephone,
+            $row->createdAt
+        );
     }
 }

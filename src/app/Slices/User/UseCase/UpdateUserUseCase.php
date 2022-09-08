@@ -35,15 +35,22 @@ class UpdateUserUseCase implements IUpdateUserUseCase
 
     public function execute(UpdateUserRequest $request): void
     {
+        $row = null;
+
+        try {
+            $row = $this->getByUuidUserQuery->execute($request->uuid);
+        } catch (Exception $e) {
+            throw new Exception("unable to get user by uuid");
+        }
+
+        if (!$row->success) {
+            throw new Exception("user not found");
+        }
+
         try {
             // TODO: add validation
-
-            $row = $this->getByUuidUserQuery->execute($request->uuid);
-            if (!$row) {
-                throw new Exception("user not found");
-            }
-
             $password = $request->password;
+
             if (!$password) {
                 $password = $row->password;
             } else {
