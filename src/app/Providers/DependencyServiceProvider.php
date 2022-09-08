@@ -2,9 +2,11 @@
 
 namespace App\Providers;
 
+use App\Slices\Publication\Domain\IGetAllPublicationAuthorQuery;
 use App\Slices\Publication\Domain\IGetAllPublicationQuery;
 use App\Slices\Publication\Domain\IGetByUuidPublicationQuery;
 use App\Slices\Publication\Domain\IStorePublicationCommand;
+use App\Slices\Publication\Repository\MySql\MySqlGetAllPublicationAuthorQuery;
 use App\Slices\Publication\Repository\MySql\MySqlGetAllPublicationQuery;
 use App\Slices\Publication\Repository\MySql\MySqlGetByUuidPublicationQuery;
 use App\Slices\Publication\Repository\MySql\MySqlStorePublicationCommand;
@@ -75,6 +77,7 @@ class DependencyServiceProvider extends ServiceProvider
         $this->app->bind(IGetAllPublicationQuery::class, MySqlGetAllPublicationQuery::class);
         $this->app->bind(IStorePublicationCommand::class, MySqlStorePublicationCommand::class);
         $this->app->bind(IGetByUuidPublicationQuery::class, MySqlGetByUuidPublicationQuery::class);
+        $this->app->bind(IGetAllPublicationAuthorQuery::class, MySqlGetAllPublicationAuthorQuery::class);
 
         // Use Case
 

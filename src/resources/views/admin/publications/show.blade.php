@@ -44,7 +44,7 @@
     </div>
 
     {{-- Authors --}}
-    {{-- <table class="table">
+    <table class="table">
         <thead>
             <tr>
                 <th scope="col">Author</th>
@@ -57,7 +57,7 @@
                 </tr>
             @endforeach
         </tbody>
-    </table> --}}
+    </table>
 
     {{-- Tags --}}
     {{-- <table class="table">

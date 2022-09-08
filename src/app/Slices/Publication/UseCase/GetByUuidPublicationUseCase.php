@@ -2,6 +2,7 @@
 
 namespace App\Slices\Publication\UseCase;
 
+use App\Slices\Publication\Domain\IGetAllPublicationAuthorQuery;
 use App\Slices\Publication\Domain\IGetByUuidPublicationQuery;
 use DateTime;
 use Exception;
@@ -15,8 +16,20 @@ class GetByUuidPublicationResponse
         public string $abstract,
         public string $downloadLink,
         public string $status,
+        public array $authors,
         public DateTime $createdAt,
         public ?DateTime $updatedAt
+    ) {
+    }
+}
+
+class GetByUuidPublicationResponseAuthorItem
+{
+    public function __construct(
+        public string $uuid,
+        public string $name,
+        public string $email,
+        public string $telephone
     ) {
     }
 }
@@ -29,7 +42,8 @@ interface IGetByUuidPublicationUseCase
 class GetByUuidPublicationUseCase implements IGetByUuidPublicationUseCase
 {
     public function __construct(
-        private IGetByUuidPublicationQuery $getByUuidPublicationQuery
+        private IGetByUuidPublicationQuery $getByUuidPublicationQuery,
+        private IGetAllPublicationAuthorQuery $getAllPublicationAuthorQuery
     ) {
     }
 
@@ -47,6 +61,17 @@ class GetByUuidPublicationUseCase implements IGetByUuidPublicationUseCase
             throw new Exception("publication not found");
         }
 
+        $authorRows = $this->getAllPublicationAuthorQuery->execute($row->id);
+        $authors = [];
+        foreach ($authorRows as $ar) {
+            $authors[] = new GetByUuidPublicationResponseAuthorItem(
+                $ar->uuid,
+                $ar->name,
+                $ar->email,
+                $ar->telephone
+            );
+        }
+
         return new GetByUuidPublicationResponse(
             $row->uuid,
             $row->name,
@@ -54,6 +79,7 @@ class GetByUuidPublicationUseCase implements IGetByUuidPublicationUseCase
             $row->abstract,
             $row->downloadLink,
             $row->status,
+            $authors,
             $row->createdAt,
             $row->updatedAt
         );
