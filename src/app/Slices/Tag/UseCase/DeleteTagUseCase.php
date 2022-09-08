@@ -21,11 +21,19 @@ class DeleteTagUseCase implements IDeleteTagUseCase
 
     public function execute(string $uuid): void
     {
+        $row = null;
+
         try {
             $row = $this->getByUuidTagQuery->execute($uuid);
-            if (!$row) {
-                throw new Exception("tag not found");
-            }
+        } catch (Exception $e) {
+            throw new Exception("unable to get tag by uuid");
+        }
+
+        if (!$row->success) {
+            throw new Exception("tag not found");
+        }
+
+        try {
             $this->deleteTagCommand->execute($row->id);
         } catch (Exception $e) {
             throw new Exception("unable to delete tag");

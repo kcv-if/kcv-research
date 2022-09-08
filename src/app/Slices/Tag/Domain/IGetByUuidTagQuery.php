@@ -5,9 +5,10 @@ namespace App\Slices\Tag\Domain;
 class GetByUuidTagQueryOutput
 {
     public function __construct(
+        public bool $success,
         public int $id,
         public string $uuid,
-        public string $name,
+        public string $name
     ) {
     }
 }

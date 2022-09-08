@@ -31,11 +31,19 @@ class UpdateTagUseCase implements IUpdateTagUseCase
 
     public function execute(UpdateTagRequest $request): void
     {
+        $row = null;
+
         try {
             $row = $this->getByUuidTagQuery->execute($request->uuid);
-            if (!$row) {
-                throw new Exception("tag not found");
-            }
+        } catch (Exception $e) {
+            throw new Exception("unable to get tag by uuid");
+        }
+
+        if (!$row->success) {
+            throw new Exception("tag not found");
+        }
+
+        try {
             $this->updateTagCommand->execute(new UpdateTagCommandInput(
                 $row->id,
                 $request->name

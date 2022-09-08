@@ -28,17 +28,21 @@ class GetByUuidTagUseCase implements IGetByUuidTagUseCase
 
     public function execute(string $uuid): GetByUuidTagResponse
     {
+        $row = null;
+
         try {
             $row = $this->getByUuidTagQuery->execute($uuid);
-            if (!$row) {
-                throw new Exception("tag not found");
-            }
-            return new GetByUuidTagResponse(
-                $row->uuid,
-                $row->name
-            );
         } catch (Exception $e) {
-            throw new Exception("unable get tag by uuid");
+            throw new Exception("unable to get tag by uuid");
         }
+
+        if (!$row->success) {
+            throw new Exception("tag not found");
+        }
+
+        return new GetByUuidTagResponse(
+            $row->uuid,
+            $row->name
+        );
     }
 }
