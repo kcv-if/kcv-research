@@ -5,6 +5,7 @@ namespace Database\Seeders;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use DB;
+use Illuminate\Support\Carbon;
 
 class PublicationReviewSeeder extends Seeder
 {
@@ -16,7 +17,7 @@ class PublicationReviewSeeder extends Seeder
     public function run()
     {
         DB::table('publication_reviews')->insert([
-            ['user_id' => 1, 'publication_id' => 1, 'comment' => "Very Good"],
+            ['user_id' => 1, 'publication_id' => 1, 'comment' => "Very Good", 'created_at' => Carbon::now()],
         ]);
     }
 }

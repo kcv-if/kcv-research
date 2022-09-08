@@ -76,7 +76,7 @@
     </table> --}}
 
     {{-- Reviewers --}}
-    {{-- <table class="table">
+    <table class="table">
         <thead>
             <tr>
                 <th scope="col">Reviewer</th>
@@ -85,13 +85,13 @@
             </tr>
         </thead>
         <tbody>
-            @foreach ($publication->reviewers as $reviewer)
+            @foreach ($publication->reviews as $review)
                 <tr>
-                    <td>{{ $reviewer->name }}</td>
-                    <td>{{ $reviewer->pivot->review_comment }}</td>
-                    <td>{{ $reviewer->pivot->reviewed_at }}</td>
+                    <td>{{ $review->name }}</td>
+                    <td>{{ $review->comment }}</td>
+                    <td>{{ $review->createdAt }}</td>
                 </tr>
             @endforeach
         </tbody>
-    </table> --}}
+    </table>
 @endsection

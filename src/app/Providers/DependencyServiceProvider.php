@@ -16,6 +16,8 @@ use App\Slices\Publication\UseCase\IGetAllPublicationUseCase;
 use App\Slices\Publication\UseCase\IGetByUuidPublicationUseCase;
 use App\Slices\Publication\UseCase\IStorePublicationUseCase;
 use App\Slices\Publication\UseCase\StorePublicationUseCase;
+use App\Slices\PublicationReview\Domain\IGetAllPublicationReviewQuery;
+use App\Slices\PublicationReview\Repository\MySql\MySqlGetAllPublicationReviewQuery;
 use App\Slices\Tag\Domain\IDeleteTagCommand;
 use App\Slices\Tag\Domain\IGetAllTagQuery;
 use App\Slices\Tag\Domain\IGetByUuidTagQuery;
@@ -78,6 +80,7 @@ class DependencyServiceProvider extends ServiceProvider
         $this->app->bind(IStorePublicationCommand::class, MySqlStorePublicationCommand::class);
         $this->app->bind(IGetByUuidPublicationQuery::class, MySqlGetByUuidPublicationQuery::class);
         $this->app->bind(IGetAllPublicationAuthorQuery::class, MySqlGetAllPublicationAuthorQuery::class);
+        $this->app->bind(IGetAllPublicationReviewQuery::class, MySqlGetAllPublicationReviewQuery::class);
 
         // Use Case
 
