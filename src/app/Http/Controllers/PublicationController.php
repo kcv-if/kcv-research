@@ -3,12 +3,18 @@
 namespace App\Http\Controllers;
 
 use App\Slices\Publication\UseCase\IGetAllPublicationUseCase;
+use App\Slices\Publication\UseCase\IGetByUuidPublicationUseCase;
+use App\Slices\Publication\UseCase\IStorePublicationUseCase;
+use App\Slices\Publication\UseCase\StorePublicationRequest;
 use Exception;
+use Illuminate\Http\Request;
 
 class PublicationController extends Controller
 {
     public function __construct(
-        private IGetAllPublicationUseCase $getAllPublicationUseCase
+        private IGetAllPublicationUseCase $getAllPublicationUseCase,
+        private IStorePublicationUseCase $storePublicationUseCase,
+        private IGetByUuidPublicationUseCase $getByUuidPublicationUseCase
     ) {
     }
 
@@ -25,83 +31,43 @@ class PublicationController extends Controller
         }
     }
 
-    // public function create()
-    // {
-    //     return view('admin.publications.create', [
-    //         'title' => 'Create Publication'
-    //     ]);
-    // }
+    public function create()
+    {
+        return view('admin.publications.create', [
+            'title' => 'Create Publication'
+        ]);
+    }
 
-    // public function store(Request $request)
-    // {
-    //     // create slug based on publication's title
-    //     $request['slug'] = SlugService::createSlug(Publication::class, 'slug', $request->name);
+    public function store(Request $request)
+    {
+        try {
+            $this->storePublicationUseCase->execute(new StorePublicationRequest(
+                $request->input('name'),
+                $request->input('excerpt'),
+                $request->input('abstract'),
+                $request->input('downloadLink'),
+                $request->input('status'),
+                array_unique(explode(' ', $request->input('tags'))),
+                array_unique(explode(' ', $request->input('authors')))
+            ));
+            return redirect('/admin/publications');
+        } catch (Exception $e) {
+            return back()->with('error', $e->getMessage());
+        }
+    }
 
-    //     // validation rules
-    //     $validated = $request->validate([
-    //         'name' => 'required',
-    //         'excerpt' => 'required',
-    //         'abstract' => 'required',
-    //         'download_link' => 'required',
-    //         'status' => ['required', Rule::in(['p', 'a', 'r'])],
-    //         'slug' => 'required|unique:publications',
-    //         'tags' => 'required',
-    //         'users' => ['required', new ValidAuthor],
-    //     ]);
-
-    //     // copy validated data to publication_data
-    //     $publication_data = $validated;
-
-    //     // delete element with key 'tags' and 'users' in publication_data
-    //     unset($publication_data['tags']);
-    //     unset($publication_data['users']);
-
-    //     // create publication
-    //     $publication = Publication::create($publication_data);
-    //     if(!$publication) {
-    //         return back()->with('error', 'Unable to create publication "' . $validated['name'] . '"');
-    //     }
-
-    //     // insert new authors
-    //     $new_emails = array_unique(explode(' ', $validated['users']));
-    //     foreach($new_emails as $new_email) {
-    //         $user_id = User::where('email', $new_email)->first()->id;
-    //         DB::table('user_publications')->insert([
-    //             'publication_id' => $publication->id,
-    //             'user_id' => $user_id
-    //         ]);
-    //     }
-
-    //     // insert new tags
-    //     $new_tags = array_unique(explode(' ', $validated['tags']));
-    //     foreach($new_tags as $new_tag) {
-    //         $tag = Tag::where('name', $new_tag)->first();
-    //         // create tag if tag does not exist
-    //         if(!$tag) {
-    //             $tag = Tag::create(['name' => $new_tag]);
-    //         }
-    //         DB::table('publication_tags')->insert([
-    //             'publication_id' => $publication->id,
-    //             'tag_id' => $tag->id
-    //         ]);
-    //     }
-
-    //     return redirect('/admin/publications');
-    // }
-
-    // public function show($id)
-    // {
-    //     // check if publication exists
-    //     $publication = Publication::find($id);
-    //     if(!$publication) {
-    //         return back()->with('error', 'Publication with id '. $id . ' not found');
-    //     }
-
-    //     return view('admin.publications.show', [
-    //         'title' => 'Publication "' . $publication->name . '"',
-    //         'publication' => $publication
-    //     ]);
-    // }
+    public function show($uuid)
+    {
+        try {
+            $response = $this->getByUuidPublicationUseCase->execute($uuid);
+            return view('admin.publications.show', [
+                'title' => "Publication's Details",
+                'publication' => $response
+            ]);
+        } catch (Exception $e) {
+            return back()->with('error', $e->getMessage());
+        }
+    }
 
     // public function edit($id)
     // {

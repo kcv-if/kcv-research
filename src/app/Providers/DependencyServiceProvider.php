@@ -3,9 +3,17 @@
 namespace App\Providers;
 
 use App\Slices\Publication\Domain\IGetAllPublicationQuery;
+use App\Slices\Publication\Domain\IGetByUuidPublicationQuery;
+use App\Slices\Publication\Domain\IStorePublicationCommand;
 use App\Slices\Publication\Repository\MySql\MySqlGetAllPublicationQuery;
+use App\Slices\Publication\Repository\MySql\MySqlGetByUuidPublicationQuery;
+use App\Slices\Publication\Repository\MySql\MySqlStorePublicationCommand;
 use App\Slices\Publication\UseCase\GetAllPublicationUseCase;
+use App\Slices\Publication\UseCase\GetByUuidPublicationUseCase;
 use App\Slices\Publication\UseCase\IGetAllPublicationUseCase;
+use App\Slices\Publication\UseCase\IGetByUuidPublicationUseCase;
+use App\Slices\Publication\UseCase\IStorePublicationUseCase;
+use App\Slices\Publication\UseCase\StorePublicationUseCase;
 use App\Slices\Tag\Domain\IDeleteTagCommand;
 use App\Slices\Tag\Domain\IGetAllTagQuery;
 use App\Slices\Tag\Domain\IGetByUuidTagQuery;
@@ -65,6 +73,8 @@ class DependencyServiceProvider extends ServiceProvider
         $this->app->bind(IUpdateUserCommand::class, MySqlUpdateUserCommand::class);
         $this->app->bind(IDeleteUserCommand::class, MySqlDeleteUserCommand::class);
         $this->app->bind(IGetAllPublicationQuery::class, MySqlGetAllPublicationQuery::class);
+        $this->app->bind(IStorePublicationCommand::class, MySqlStorePublicationCommand::class);
+        $this->app->bind(IGetByUuidPublicationQuery::class, MySqlGetByUuidPublicationQuery::class);
 
         // Use Case
 
@@ -79,5 +89,7 @@ class DependencyServiceProvider extends ServiceProvider
         $this->app->bind(IUpdateUserUseCase::class, UpdateUserUseCase::class);
         $this->app->bind(IDeleteUserUseCase::class, DeleteUserUseCase::class);
         $this->app->bind(IGetAllPublicationUseCase::class, GetAllPublicationUseCase::class);
+        $this->app->bind(IStorePublicationUseCase::class, StorePublicationUseCase::class);
+        $this->app->bind(IGetByUuidPublicationUseCase::class, GetByUuidPublicationUseCase::class);
     }
 }
