@@ -21,8 +21,10 @@ class DatabaseSeeder extends Seeder
             DatasetSeeder::class,
             PublicationTagSeeder::class,
             DatasetTagSeeder::class,
-            UserDatasetSeeder::class,
-            UserPublicationSeeder::class,
+            DatasetAuthorSeeder::class,
+            DatasetReviewSeeder::class,
+            PublicationAuthorSeeder::class,
+            PublicationReviewSeeder::class,
         ]);
     }
 }

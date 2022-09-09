@@ -2,30 +2,41 @@
 
 namespace App\Http\Controllers;
 
+use App\Slices\Tag\Domain\IGetByUuidTagQuery;
+use App\Slices\Tag\UseCase\IDeleteTagUseCase;
+use App\Slices\Tag\UseCase\IGetAllTagUseCase;
+use App\Slices\Tag\UseCase\IGetByUuidTagUseCase;
+use App\Slices\Tag\UseCase\IStoreTagUseCase;
+use App\Slices\Tag\UseCase\IUpdateTagUseCase;
+use App\Slices\Tag\UseCase\StoreTagRequest;
+use App\Slices\Tag\UseCase\UpdateTagRequest;
+use Exception;
 use Illuminate\Http\Request;
-use App\Models\Tag;
 
 class TagController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function index()
-    {
-        $tags = Tag::all();
-        return view('admin.tags.index', [
-            'title' => 'Tags',
-            'tags' => $tags
-        ]);
+    public function __construct(
+        private IGetAllTagUseCase $getAllTagUseCase,
+        private IStoreTagUseCase $storeTagUseCase,
+        private IGetByUuidTagUseCase $getByUuidTagUseCase,
+        private IDeleteTagUseCase $deleteTagUseCase,
+        private IUpdateTagUseCase $updateTagUseCase
+    ) {
     }
 
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
+    public function index()
+    {
+        try {
+            $response = $this->getAllTagUseCase->execute();
+            return view('admin.tags.index', [
+                'title' => 'Tags',
+                'tags' => $response
+            ]);
+        } catch (Exception $e) {
+            return back()->with('error', $e->getMessage());
+        }
+    }
+
     public function create()
     {
         return view('admin.tags.create', [
@@ -33,137 +44,77 @@ class TagController extends Controller
         ]);
     }
 
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
     public function store(Request $request)
     {
-        $validated = $request->validate([
-            'name' => 'required|unique:tags'
-        ]);
-        if(!Tag::create($validated)) {
-            return back()->with('error', 'Unable to create tag "' . $validated['name'] . '"');
+        try {
+            $this->storeTagUseCase->execute(new StoreTagRequest($request->name));
+            return redirect('/admin/tags');
+        } catch (Exception $e) {
+            return back()->with('error', $e->getMessage());
         }
-        return redirect('/admin/tags');
     }
 
-    /**
-     * Display the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function show($id)
+    public function show($uuid)
     {
-        $tag = Tag::find($id);
-        if(!$tag) {
-            return back()->with('error', 'Tag with id '. $id . ' not found');
+        try {
+            $response = $this->getByUuidTagUseCase->execute($uuid);
+            return view('admin.tags.show', [
+                'title' => 'Tag',
+                'tag' => $response
+            ]);
+        } catch (Exception $e) {
+            return back()->with('error', $e->getMessage());
         }
-
-        return view('admin.tags.show', [
-            'title' => 'Tags',
-            'tag' => $tag
-        ]);
     }
 
-    public function show_publications($id)
+    public function edit($uuid)
     {
-        $tag = Tag::find($id);
-        if(!$tag) {
-            return back()->with('error', 'Tag with id '. $id . ' not found');
+        try {
+            $response = $this->getByUuidTagUseCase->execute($uuid);
+            return view('admin.tags.update', [
+                'title' => 'Update Tag',
+                'tag' => $response
+            ]);
+        } catch (Exception $e) {
+            return back()->with('error', $e->getMessage());
         }
-
-        return view('admin.tags.show_publications', [
-            'title' => 'Tags',
-            'tag' => $tag
-        ]);
     }
 
-    public function show_datasets($id)
+
+    public function update(Request $request, $uuid)
     {
-        $tag = Tag::find($id);
-        if(!$tag) {
-            return back()->with('error', 'Tag with id '. $id . ' not found');
+        try {
+            $this->updateTagUseCase->execute(new UpdateTagRequest(
+                $uuid,
+                $request->input("name")
+            ));
+            return redirect('/admin/tags');
+        } catch (Exception $e) {
+            return back()->with('error', $e->getMessage());
         }
-
-        return view('admin.tags.show_datasets', [
-            'title' => 'Tags',
-            'tag' => $tag
-        ]);
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function edit($id)
+
+    public function destroy($uuid)
     {
-        $tag = Tag::find($id);
-        if(!$tag) {
-            return back()->with('error', 'Tag with id '. $id . ' not found');
+        try {
+            $this->deleteTagUseCase->execute($uuid);
+            return redirect('/admin/tags');
+        } catch (Exception $e) {
+            return back()->with('error', $e->getMessage());
         }
-
-        return view('admin.tags.update', [
-            'title' => 'Update Tag',
-            'tag' => $tag
-        ]);
     }
 
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function update(Request $request, $id)
-    {
-        $tag = Tag::find($id);
-        if(!$tag) {
-            return back()->with('error', 'Tag with id '. $id . ' not found');
-        }
+    // public function get_by_name(Request $request)
+    // {
+    //     if ($request->keyword === '') {
+    //         return response()->json([], 200);
+    //     }
 
-        $validated = $request->validate([
-            'name' => 'required|unique:tags'
-        ]);
-        if(!Tag::where('id', $id)->update($validated)) {
-            return back()->with('error', 'Unable to update tag "' . $validated['name'] . '"');
-        }
-        return redirect('/admin/tags');
-    }
+    //     $tags = Tag::where('name', 'LIKE', '%' . $request->keyword . '%')->get();
 
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function destroy($id)
-    {
-        $tag = Tag::find($id);
-        if(!$tag) {
-            return back()->with('error', 'Tag with id '. $id . ' not found');
-        }
-
-        Tag::destroy($id);
-
-        return redirect('/admin/tags');
-    }
-
-    public function get_by_name(Request $request) {
-        if($request->keyword === '') {
-            return response()->json([], 200);
-        }
-
-        $tags = Tag::where('name', 'LIKE', '%' . $request->keyword . '%')->get();
-
-        return response()->json([
-            'tags' => $tags
-        ], 200);
-    }
+    //     return response()->json([
+    //         'tags' => $tags
+    //     ], 200);
+    // }
 }

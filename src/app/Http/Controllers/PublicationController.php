@@ -2,39 +2,40 @@
 
 namespace App\Http\Controllers;
 
+use App\Slices\Publication\UseCase\IDeletePublicationUseCase;
+use App\Slices\Publication\UseCase\IGetAllPublicationUseCase;
+use App\Slices\Publication\UseCase\IGetByUuidPublicationUseCase;
+use App\Slices\Publication\UseCase\IStorePublicationUseCase;
+use App\Slices\Publication\UseCase\IUpdatePublicationUseCase;
+use App\Slices\Publication\UseCase\StorePublicationRequest;
+use App\Slices\Publication\UseCase\UpdatePublicationRequest;
+use Exception;
 use Illuminate\Http\Request;
-use App\Models\Publication;
-use App\Models\User;
-use App\Models\Tag;
-use App\Rules\ValidAuthor;
-use Illuminate\Validation\Rule;
-use Cviebrock\EloquentSluggable\Services\SlugService;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Auth;
-use Carbon\Carbon;
 
 class PublicationController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function index()
-    {
-        // get all publications
-        $publications = Publication::all();
-        return view('admin.publications.index', [
-            'title' => 'Publications',
-            'publications' => $publications
-        ]);
+    public function __construct(
+        private IGetAllPublicationUseCase $getAllPublicationUseCase,
+        private IStorePublicationUseCase $storePublicationUseCase,
+        private IGetByUuidPublicationUseCase $getByUuidPublicationUseCase,
+        private IDeletePublicationUseCase $deletePublicationUseCase,
+        private IUpdatePublicationUseCase $updatePublicationUseCase
+    ) {
     }
 
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
+    public function index()
+    {
+        try {
+            $response = $this->getAllPublicationUseCase->execute();
+            return view('admin.publications.index', [
+                'title' => 'Publications',
+                'publications' => $response
+            ]);
+        } catch (Exception $e) {
+            return back()->with('error', $e->getMessage());
+        }
+    }
+
     public function create()
     {
         return view('admin.publications.create', [
@@ -42,287 +43,158 @@ class PublicationController extends Controller
         ]);
     }
 
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
     public function store(Request $request)
     {
-        // create slug based on publication's title
-        $request['slug'] = SlugService::createSlug(Publication::class, 'slug', $request->name);
-
-        // validation rules
-        $validated = $request->validate([
-            'name' => 'required',
-            'excerpt' => 'required',
-            'abstract' => 'required',
-            'download_link' => 'required',
-            'status' => ['required', Rule::in(['p', 'a', 'r'])],
-            'slug' => 'required|unique:publications',
-            'tags' => 'required',
-            'users' => ['required', new ValidAuthor],
-        ]);
-
-        // copy validated data to publication_data
-        $publication_data = $validated;
-
-        // delete element with key 'tags' and 'users' in publication_data
-        unset($publication_data['tags']);
-        unset($publication_data['users']);
-
-        // create publication
-        $publication = Publication::create($publication_data);
-        if(!$publication) {
-            return back()->with('error', 'Unable to create publication "' . $validated['name'] . '"');
-        }
-
-        // insert new authors
-        $new_emails = array_unique(explode(' ', $validated['users']));
-        foreach($new_emails as $new_email) {
-            $user_id = User::where('email', $new_email)->first()->id;
-            DB::table('user_publications')->insert([
-                'publication_id' => $publication->id,
-                'user_id' => $user_id
-            ]);
-        }
-
-        // insert new tags
-        $new_tags = array_unique(explode(' ', $validated['tags']));
-        foreach($new_tags as $new_tag) {
-            $tag = Tag::where('name', $new_tag)->first();
-            // create tag if tag does not exist
-            if(!$tag) {
-                $tag = Tag::create(['name' => $new_tag]);
-            }
-            DB::table('publication_tags')->insert([
-                'publication_id' => $publication->id,
-                'tag_id' => $tag->id
-            ]);
-        }
-
-        return redirect('/admin/publications');
-    }
-
-    /**
-     * Display the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function show($id)
-    {
-        // check if publication exists
-        $publication = Publication::find($id);
-        if(!$publication) {
-            return back()->with('error', 'Publication with id '. $id . ' not found');
-        }
-
-        return view('admin.publications.show', [
-            'title' => 'Publication "' . $publication->name . '"',
-            'publication' => $publication
-        ]);
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function edit($id)
-    {
-        // check if publication exists
-        $publication = Publication::find($id);
-        if(!$publication) {
-            return back()->with('error', 'Publication with id '. $id . ' not found');
-        }
-
-        // join all tags
+        // TODO: this is just a short term solution, please make this more proper
         $tags = [];
-        foreach($publication->tags as $tag) {
-            $tags[] = $tag->name;
+        if (trim($request->input('tags')) !== "") {
+            $tags = array_unique(explode(' ', $request->input('tags')));
         }
-
-        // join all authors
         $authors = [];
-        foreach($publication->authors as $author) {
-            $authors[] = $author->email;
+        if (trim($request->input('authors')) !== "") {
+            $authors = array_unique(explode(' ', $request->input('authors')));
         }
 
-        // TODO: make status passing more elegant
-        $status = [];
-        $status[$publication->status] = true;
-        return view('admin.publications.update', [
-            'title' => 'Update Publication',
-            'publication' => $publication,
-            'status' => $status,
-            'tags' => join(" ", $tags),
-            'users' => join(" ", $authors)
-        ]);
+        try {
+            $this->storePublicationUseCase->execute(new StorePublicationRequest(
+                $request->input('name'),
+                $request->input('excerpt'),
+                $request->input('abstract'),
+                $request->input('downloadLink'),
+                $request->input('status'),
+                $tags,
+                $authors
+            ));
+            return redirect('/admin/publications');
+        } catch (Exception $e) {
+            return back()->with('error', $e->getMessage());
+        }
     }
 
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function update(Request $request, $id)
+    public function show($uuid)
     {
-        // check if publication exists
-        $publication = Publication::find($id);
-        if(!$publication) {
-            return back()->with('error', 'Publication with id '. $id . ' not found');
-        }
-
-        // create slug based on publication's title
-        $request['slug'] = SlugService::createSlug(Publication::class, 'slug', $request->name);
-
-        // validation rules
-        $validation_rules = [
-            'name' => 'required',
-            'excerpt' => 'required',
-            'abstract' => 'required',
-            'download_link' => 'required',
-            'status' => ['required', Rule::in(['p', 'a', 'r'])],
-            'slug' => 'required',
-            'tags' => 'required',
-            'users' => ['required', new ValidAuthor],
-        ];
-
-        // if slug is different, then check if it is unique
-        if ($request['slug'] !== $publication->slug) {
-            $validation_rules['slug'] = ['required', 'unique:publications'];
-        }
-
-        // validate
-        $validated = $request->validate($validation_rules);
-
-        // copy validated data to publication_data
-        $publication_data = $validated;
-
-        // delete element with key 'tags' and 'users' in publication_data
-        unset($publication_data['tags']);
-        unset($publication_data['users']);
-
-        // update publication
-        if(!Publication::where('id', $id)->update($publication_data)) {
-            return back()->with('error', 'Unable to update publication "' . $validated['name'] . '"');
-        }
-
-        // delete previous authors
-        DB::table('user_publications')
-            ->where('publication_id', $publication->id)
-            ->where('is_review', false)
-            ->delete();
-
-        // insert new authors
-        $new_emails = array_unique(explode(' ', $validated['users']));
-        foreach($new_emails as $new_email) {
-            $user_id = User::where('email', $new_email)->first()->id;
-            DB::table('user_publications')->insert([
-                'publication_id' => $publication->id,
-                'user_id' => $user_id
+        try {
+            $response = $this->getByUuidPublicationUseCase->execute($uuid);
+            return view('admin.publications.show', [
+                'title' => "Publication's Details",
+                'publication' => $response
             ]);
+        } catch (Exception $e) {
+            return back()->with('error', $e->getMessage());
         }
+    }
 
-        // delete previous tags
-        DB::table('publication_tags')
-            ->where('publication_id', $publication->id)
-            ->delete();
+    public function edit($uuid)
+    {
+        try {
+            $response = $this->getByUuidPublicationUseCase->execute($uuid);
 
-        // insert new tags
-        $new_tags = array_unique(explode(' ', $validated['tags']));
-        foreach($new_tags as $new_tag) {
-            $tag = Tag::where('name', $new_tag)->first();
-            // create tag if tag does not exist
-            if(!$tag) {
-                $tag = Tag::create(['name' => $new_tag]);
+            // TODO: make this more proper
+            $status = [];
+            $status[$response->status] = true;
+
+            $authorUuids = [];
+            foreach ($response->authors as $a) {
+                $authorUuids[] = $a->uuid;
             }
-            DB::table('publication_tags')->insert([
-                'publication_id' => $publication->id,
-                'tag_id' => $tag->id
+
+            $tagUuids = [];
+            foreach ($response->tags as $t) {
+                $tagUuids[] = $t->uuid;
+            }
+
+            return view('admin.publications.update', [
+                'title' => 'Update Publication',
+                'publication' => $response,
+                'status' => $status,
+                'authors' => join(" ", $authorUuids),
+                'tags' => join(" ", $tagUuids)
             ]);
+        } catch (Exception $e) {
+            return back()->with('error', $e->getMessage());
         }
-
-        return redirect('/admin/publications');
     }
 
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function destroy($id)
+    public function update(Request $request, $uuid)
     {
-        // check if publication exists
-        $publication = Publication::find($id);
-        if(!$publication) {
-            return back()->with('error', 'Publication with id '. $id . ' not found');
+        // TODO: this is just a short term solution, please make this more proper
+        $tags = [];
+        if (trim($request->input('tags')) !== "") {
+            $tags = array_unique(explode(' ', $request->input('tags')));
+        }
+        $authors = [];
+        if (trim($request->input('authors')) !== "") {
+            $authors = array_unique(explode(' ', $request->input('authors')));
         }
 
-        // delete publication
-        Publication::destroy($id);
-
-        return redirect('/admin/publications');
+        try {
+            $this->updatePublicationUseCase->execute(new UpdatePublicationRequest(
+                $uuid,
+                $request->input('name'),
+                $request->input('excerpt'),
+                $request->input('abstract'),
+                $request->input('downloadLink'),
+                $request->input('status'),
+                $tags,
+                $authors
+            ));
+            return redirect('/admin/publications');
+        } catch (Exception $e) {
+            return back()->with('error', $e->getMessage());
+        }
     }
 
-    /**
-     * Show the form for creating a new review.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function create_review($id)
+    public function destroy($uuid)
     {
-        return view('admin.publications.create_review', [
-            'title' => 'Create Review',
-            'publication_id' => $id
-        ]);
+        try {
+            $this->deletePublicationUseCase->execute($uuid);
+            return redirect('/admin/publications');
+        } catch (Exception $e) {
+            return back()->with('error', $e->getMessage());
+        }
     }
 
-    /**
-     * Store a newly created review in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
-    public function store_review(Request $request, $id) {
-        // validate
-        $validated = $request->validate([
-            'status' => ['required', Rule::in(['p', 'a', 'r'])],
-            'review' => 'required'
-        ]);
+    // public function create_review($id)
+    // {
+    //     return view('admin.publications.create_review', [
+    //         'title' => 'Create Review',
+    //         'publication_id' => $id
+    //     ]);
+    // }
 
-        // get current admin id
-        $user_id = Auth::id();
+    // public function store_review(Request $request, $id) {
+    //     // validate
+    //     $validated = $request->validate([
+    //         'status' => ['required', Rule::in(['p', 'a', 'r'])],
+    //         'review' => 'required'
+    //     ]);
 
-        // check if admin has reviewed publication
-        if(DB::table('user_publications')
-            ->where('user_id', $user_id)
-            ->where('is_review', true)
-            ->first()
-        ) {
-            return back()->with('error', 'Already reviewed publication with id ' . $id);
-        }
+    //     // get current admin id
+    //     $user_id = Auth::id();
 
-        // update publication status
-        if(!Publication::where('id', $id)->update(['status' => $validated['status']])) {
-            return back()->with('error', 'Unable to update publication with id ' . $id);
-        }
+    //     // check if admin has reviewed publication
+    //     if(DB::table('user_publications')
+    //         ->where('user_id', $user_id)
+    //         ->where('is_review', true)
+    //         ->first()
+    //     ) {
+    //         return back()->with('error', 'Already reviewed publication with id ' . $id);
+    //     }
 
-        // insert new review
-        DB::table('user_publications')->insert([
-            'publication_id' => $id,
-            'user_id' => $user_id,
-            'is_review' => true,
-            'review_comment' => $validated['review'],
-            'reviewed_at' => Carbon::now()
-        ]);
+    //     // update publication status
+    //     if(!Publication::where('id', $id)->update(['status' => $validated['status']])) {
+    //         return back()->with('error', 'Unable to update publication with id ' . $id);
+    //     }
 
-        return redirect('/admin/publications');
-    }
+    //     // insert new review
+    //     DB::table('user_publications')->insert([
+    //         'publication_id' => $id,
+    //         'user_id' => $user_id,
+    //         'is_review' => true,
+    //         'review_comment' => $validated['review'],
+    //         'reviewed_at' => Carbon::now()
+    //     ]);
+
+    //     return redirect('/admin/publications');
+    // }
 }

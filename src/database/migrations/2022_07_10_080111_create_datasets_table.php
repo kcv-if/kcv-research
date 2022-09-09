@@ -15,11 +15,11 @@ return new class extends Migration
     {
         Schema::create('datasets', function (Blueprint $table) {
             $table->id();
+            $table->string('uuid')->unique();
             $table->string('name');
             $table->text('description');
             $table->string('download_link');
             $table->char('status', 1)->default('p');
-            $table->string('slug')->unique();
             $table->timestamps();
         });
     }

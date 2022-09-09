@@ -2,39 +2,40 @@
 
 namespace App\Http\Controllers;
 
+use App\Slices\Dataset\UseCase\IDeleteDatasetUseCase;
+use App\Slices\Dataset\UseCase\IGetAllDatasetUseCase;
+use App\Slices\Dataset\UseCase\IGetByUuidDatasetUseCase;
+use App\Slices\Dataset\UseCase\IStoreDatasetUseCase;
+use App\Slices\Dataset\UseCase\IUpdateDatasetUseCase;
+use App\Slices\Dataset\UseCase\StoreDatasetRequest;
+use App\Slices\Dataset\UseCase\UpdateDatasetRequest;
+use Exception;
 use Illuminate\Http\Request;
-use App\Models\Dataset;
-use App\Models\User;
-use App\Models\Tag;
-use App\Rules\ValidAuthor;
-use Illuminate\Validation\Rule;
-use Cviebrock\EloquentSluggable\Services\SlugService;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Auth;
-use Carbon\Carbon;
 
 class DatasetController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function index()
-    {
-        $datasets = Dataset::all();
-        
-        return view('admin.datasets.index',[
-            'title' => 'Datasets',
-            'datasets' => $datasets
-        ]);
+    public function __construct(
+        private IGetAllDatasetUseCase $getAllDatasetUseCase,
+        private IStoreDatasetUseCase $storeDatasetUseCase,
+        private IGetByUuidDatasetUseCase $getByUuidDatasetUseCase,
+        private IDeleteDatasetUseCase $deleteDatasetUseCase,
+        private IUpdateDatasetUseCase $updateDatasetUseCase
+    ) {
     }
 
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
+    public function index()
+    {
+        try {
+            $response = $this->getAllDatasetUseCase->execute();
+            return view('admin.datasets.index', [
+                'title' => 'Datasets',
+                'datasets' => $response
+            ]);
+        } catch (Exception $e) {
+            return back()->with('error', $e->getMessage());
+        }
+    }
+
     public function create()
     {
         return view('admin.datasets.create', [
@@ -42,284 +43,156 @@ class DatasetController extends Controller
         ]);
     }
 
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
     public function store(Request $request)
     {
-        // create slug based on dataset's title
-        $request['slug'] = SlugService::createSlug(Dataset::class, 'slug', $request->name);
-
-        // validation rules
-        $validated = $request->validate([
-            'name' => 'required',
-            'description' => 'required',
-            'download_link' => 'required',
-            'status' => ['required', Rule::in(['p', 'a', 'r'])],
-            'slug' => 'required|unique:datasets',
-            'tags' => 'required',
-            'users' => ['required', new ValidAuthor],
-        ]);
-
-        // copy validated data to dataset_data
-        $dataset_data = $validated;
-
-        // delete element with key 'tags' and 'users' in dataset_data
-        unset($dataset_data['tags']);
-        unset($dataset_data['users']);
-
-        // create dataset
-        $dataset = Dataset::create($dataset_data);
-        if(!$dataset) {
-            return back()->with('error', 'Unable to create dataset "' . $validated['name'] . '"');
-        }
-
-        // insert new authors
-        $new_emails = array_unique(explode(' ', $validated['users']));
-        foreach($new_emails as $new_email) {
-            $user_id = User::where('email', $new_email)->first()->id;
-            DB::table('user_datasets')->insert([
-                'dataset_id' => $dataset->id,
-                'user_id' => $user_id
-            ]);
-        }
-
-        // insert new tags
-        $new_tags = array_unique(explode(' ', $validated['tags']));
-        foreach($new_tags as $new_tag) {
-            $tag = Tag::where('name', $new_tag)->first();
-            // create tag if tag does not exist
-            if(!$tag) {
-                $tag = Tag::create(['name' => $new_tag]);
-            }
-            DB::table('dataset_tags')->insert([
-                'dataset_id' => $dataset->id,
-                'tag_id' => $tag->id
-            ]);
-        }
-
-        return redirect('/admin/datasets');
-    }
-
-    /**
-     * Display the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function show($id)
-    {
-        // check if dataset exists
-        $dataset = Dataset::find($id);
-        if(!$dataset) {
-            return back()->with('error', 'Dataset with id '. $id . ' not found');
-        }
-
-        return view('admin.datasets.show', [
-            'title' => 'Dataset "' . $dataset->name . '"',
-            'dataset' => $dataset
-        ]);
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function edit($id)
-    {
-        // check if dataset exists
-        $dataset = Dataset::find($id);
-        if(!$dataset) {
-            return back()->with('error', 'Dataset with id '. $id . ' not found');
-        }
-
-        // join all tags
+        // TODO: this is just a short term solution, please make this more proper
         $tags = [];
-        foreach($dataset->tags as $tag) {
-            $tags[] = $tag->name;
+        if (trim($request->input('tags')) !== "") {
+            $tags = array_unique(explode(' ', $request->input('tags')));
         }
-
-        // join all authors
         $authors = [];
-        foreach($dataset->authors as $author) {
-            $authors[] = $author->email;
+        if (trim($request->input('authors')) !== "") {
+            $authors = array_unique(explode(' ', $request->input('authors')));
         }
 
-        // TODO: make status passing more elegant
-        $status = [];
-        $status[$dataset->status] = true;
-        return view('admin.datasets.update', [
-            'title' => 'Update Dataset',
-            'dataset' => $dataset,
-            'status' => $status,
-            'tags' => join(" ", $tags),
-            'users' => join(" ", $authors)
-        ]);
+        try {
+            $this->storeDatasetUseCase->execute(new StoreDatasetRequest(
+                $request->input('name'),
+                $request->input('description'),
+                $request->input('downloadLink'),
+                $request->input('status'),
+                $tags,
+                $authors
+            ));
+            return redirect('/admin/datasets');
+        } catch (Exception $e) {
+            return back()->with('error', $e->getMessage());
+        }
     }
 
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function update(Request $request, $id)
+    public function show($uuid)
     {
-        // check if dataset exists
-        $dataset = Dataset::find($id);
-        if(!$dataset) {
-            return back()->with('error', 'Dataset with id '. $id . ' not found');
-        }
-
-        // create slug based on dataset's title
-        $request['slug'] = SlugService::createSlug(Dataset::class, 'slug', $request->name);
-
-        // validation rules
-        $validation_rules = [
-            'name' => 'required',
-            'description' => 'required',
-            'download_link' => 'required',
-            'status' => ['required', Rule::in(['p', 'a', 'r'])],
-            'slug' => 'required',
-            'tags' => 'required',
-            'users' => ['required', new ValidAuthor],
-        ];
-
-        // if slug is different, then check if it is unique
-        if ($request['slug'] !== $dataset->slug) {
-            $validation_rules['slug'] = ['required', 'unique:datasets'];
-        }
-
-        // validate
-        $validated = $request->validate($validation_rules);
-
-        // copy validated data to dataset_data
-        $dataset_data = $validated;
-
-        // delete element with key 'tags' and 'users' in dataset_data
-        unset($dataset_data['tags']);
-        unset($dataset_data['users']);
-
-        // update dataset
-        if(!Dataset::where('id', $id)->update($dataset_data)) {
-            return back()->with('error', 'Unable to update dataset "' . $validated['name'] . '"');
-        }
-
-        // delete previous authors
-        DB::table('user_datasets')
-            ->where('dataset_id', $dataset->id)
-            ->where('is_review', false)
-            ->delete();
-
-        // insert new authors
-        $new_emails = array_unique(explode(' ', $validated['users']));
-        foreach($new_emails as $new_email) {
-            $user_id = User::where('email', $new_email)->first()->id;
-            DB::table('user_datasets')->insert([
-                'dataset_id' => $dataset->id,
-                'user_id' => $user_id
+        try {
+            $response = $this->getByUuidDatasetUseCase->execute($uuid);
+            return view('admin.datasets.show', [
+                'title' => "Dataset's Details",
+                'dataset' => $response
             ]);
+        } catch (Exception $e) {
+            return back()->with('error', $e->getMessage());
         }
+    }
 
-        // delete previous tags
-        DB::table('dataset_tags')
-            ->where('dataset_id', $dataset->id)
-            ->delete();
+    public function edit($uuid)
+    {
+        try {
+            $response = $this->getByUuidDatasetUseCase->execute($uuid);
 
-        // insert new tags
-        $new_tags = array_unique(explode(' ', $validated['tags']));
-        foreach($new_tags as $new_tag) {
-            $tag = Tag::where('name', $new_tag)->first();
-            // create tag if tag does not exist
-            if(!$tag) {
-                $tag = Tag::create(['name' => $new_tag]);
+            // TODO: make this more proper
+            $status = [];
+            $status[$response->status] = true;
+
+            $authorUuids = [];
+            foreach ($response->authors as $a) {
+                $authorUuids[] = $a->uuid;
             }
-            DB::table('dataset_tags')->insert([
-                'dataset_id' => $dataset->id,
-                'tag_id' => $tag->id
+
+            $tagUuids = [];
+            foreach ($response->tags as $t) {
+                $tagUuids[] = $t->uuid;
+            }
+
+            return view('admin.datasets.update', [
+                'title' => 'Update Dataset',
+                'dataset' => $response,
+                'status' => $status,
+                'authors' => join(" ", $authorUuids),
+                'tags' => join(" ", $tagUuids)
             ]);
+        } catch (Exception $e) {
+            return back()->with('error', $e->getMessage());
         }
-
-        return redirect('/admin/datasets');
     }
 
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function destroy($id)
+    public function update(Request $request, $uuid)
     {
-        $dataset = Dataset::find($id);
-        if(!$dataset) {
-            return back()->with('error', 'Dataset with id '. $id . ' not found');
+        // TODO: this is just a short term solution, please make this more proper
+        $tags = [];
+        if (trim($request->input('tags')) !== "") {
+            $tags = array_unique(explode(' ', $request->input('tags')));
+        }
+        $authors = [];
+        if (trim($request->input('authors')) !== "") {
+            $authors = array_unique(explode(' ', $request->input('authors')));
         }
 
-        // delete dataset
-        Dataset::destroy($id);
-
-        return redirect('/admin/datasets');
+        try {
+            $this->updateDatasetUseCase->execute(new UpdateDatasetRequest(
+                $uuid,
+                $request->input('name'),
+                $request->input('description'),
+                $request->input('downloadLink'),
+                $request->input('status'),
+                $tags,
+                $authors
+            ));
+            return redirect('/admin/datasets');
+        } catch (Exception $e) {
+            return back()->with('error', $e->getMessage());
+        }
     }
 
-    /**
-     * Show the form for creating a new review.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function create_review($id)
+    public function destroy($uuid)
     {
-        return view('admin.datasets.create_review', [
-            'title' => 'Create Review',
-            'dataset_id' => $id
-        ]);
+        try {
+            $this->deleteDatasetUseCase->execute($uuid);
+            return redirect('/admin/datasets');
+        } catch (Exception $e) {
+            return back()->with('error', $e->getMessage());
+        }
     }
 
-    /**
-     * Store a newly created review in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
-    public function store_review(Request $request, $id) {
-        // validate
-        $validated = $request->validate([
-            'status' => ['required', Rule::in(['p', 'a', 'r'])],
-            'review' => 'required'
-        ]);
+    // public function create_review($id)
+    // {
+    //     return view('admin.datasets.create_review', [
+    //         'title' => 'Create Review',
+    //         'dataset_id' => $id
+    //     ]);
+    // }
 
-        // get current admin id
-        $user_id = Auth::id();
+    // public function store_review(Request $request, $id) {
+    //     // validate
+    //     $validated = $request->validate([
+    //         'status' => ['required', Rule::in(['p', 'a', 'r'])],
+    //         'review' => 'required'
+    //     ]);
 
-        // check if admin has reviewed dataset
-        if(DB::table('user_datasets')
-            ->where('user_id', $user_id)
-            ->where('is_review', true)
-            ->first()
-        ) {
-            return back()->with('error', 'Already reviewed dataset with id ' . $id);
-        }
+    //     // get current admin id
+    //     $user_id = Auth::id();
 
-        // update dataset status
-        if(!Dataset::where('id', $id)->update(['status' => $validated['status']])) {
-            return back()->with('error', 'Unable to update dataset with id ' . $id);
-        }
+    //     // check if admin has reviewed dataset
+    //     if(DB::table('user_datasets')
+    //         ->where('user_id', $user_id)
+    //         ->where('is_review', true)
+    //         ->first()
+    //     ) {
+    //         return back()->with('error', 'Already reviewed dataset with id ' . $id);
+    //     }
 
-        // insert new review
-        DB::table('user_datasets')->insert([
-            'dataset_id' => $id,
-            'user_id' => $user_id,
-            'is_review' => true,
-            'review_comment' => $validated['review'],
-            'reviewed_at' => Carbon::now()
-        ]);
+    //     // update dataset status
+    //     if(!Dataset::where('id', $id)->update(['status' => $validated['status']])) {
+    //         return back()->with('error', 'Unable to update dataset with id ' . $id);
+    //     }
 
-        return redirect('/admin/datasets');
-    }
+    //     // insert new review
+    //     DB::table('user_datasets')->insert([
+    //         'dataset_id' => $id,
+    //         'user_id' => $user_id,
+    //         'is_review' => true,
+    //         'review_comment' => $validated['review'],
+    //         'reviewed_at' => Carbon::now()
+    //     ]);
+
+    //     return redirect('/admin/datasets');
+    // }
 }

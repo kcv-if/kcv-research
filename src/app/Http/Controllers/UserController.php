@@ -4,32 +4,41 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\User;
+use App\Slices\User\UseCase\IDeleteUserUseCase;
+use App\Slices\User\UseCase\IGetAllUserUseCase;
+use App\Slices\User\UseCase\IGetByUuidUserUseCase;
+use App\Slices\User\UseCase\IStoreUserUseCase;
+use App\Slices\User\UseCase\IUpdateUserUseCase;
+use App\Slices\User\UseCase\StoreUserRequest;
+use App\Slices\User\UseCase\UpdateUserRequest;
+use Exception;
 use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\Hash;
 
 class UserController extends Controller
 {
-    public static $user_roles = ['a' => 'Admin', 'u' => 'User'];
-
-    /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function index()
-    {
-        $users = User::all();
-        return view('admin.users.index', [
-            'title' => 'Users',
-            'users' => $users
-        ]);
+    public function __construct(
+        private IGetAllUserUseCase $getAllUserUseCase,
+        private IStoreUserUseCase $storeUserUseCase,
+        private IGetByUuidUserUseCase $getByUuidUserUseCase,
+        private IUpdateUserUseCase $updateUserUseCase,
+        private IDeleteUserUseCase $deleteUserUseCase
+    ) {
     }
 
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
+    public function index()
+    {
+        try {
+            $response = $this->getAllUserUseCase->execute();
+            return view('admin.users.index', [
+                'title' => 'Users',
+                'users' => $response
+            ]);
+        } catch (Exception $e) {
+            return back()->with('error', $e->getMessage());
+        }
+    }
+
     public function create()
     {
         return view('admin.users.create', [
@@ -37,181 +46,83 @@ class UserController extends Controller
         ]);
     }
 
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
     public function store(Request $request)
     {
-        $validated = $request->validate([
-            'role' => ['required', Rule::in(['u', 'a'])],
-            'name' => 'required',
-            'email' => 'required|email:rfc,dns|unique:users',
-            'password' => 'required|min:6',
-            'telephone' => 'required|numeric',
-        ]);
-
-        $validated['password'] = Hash::make($validated['password']);
-
-        if(!User::create($validated)) {
-            return back()->with('error', 'Unable to create user "' . $validated['name'] . '"');
+        try {
+            $this->storeUserUseCase->execute(new StoreUserRequest(
+                $request->input('role'),
+                $request->input('name'),
+                $request->input('email'),
+                $request->input('password'),
+                $request->input('telephone')
+            ));
+            return redirect('/admin/users');
+        } catch (Exception $e) {
+            return back()->with('error', $e->getMessage());
         }
-        return redirect('/admin/users');
     }
 
-    /**
-     * Display the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function show($id)
+    public function show($uuid)
     {
-        $user = User::find($id);
-        if(!$user) {
-            return back()->with('error', 'User with id '. $id . ' not found');
+        try {
+            $response = $this->getByUuidUserUseCase->execute($uuid);
+            return view('admin.users.show', [
+                'title' => 'User\'s Details',
+                'user' => $response
+            ]);
+        } catch (Exception $e) {
+            return back()->with('error', $e->getMessage());
         }
-
-        $user->role = self::$user_roles[$user->role];
-
-        return view('admin.users.show', [
-            'title' => 'User\'s Details',
-            'user' => $user
-        ]);
     }
 
-    public function show_publications($id)
+    public function edit($uuid)
     {
-        $user = User::find($id);
-        if(!$user) {
-            return back()->with('error', 'User with id '. $id . ' not found');
+        try {
+            $response = $this->getByUuidUserUseCase->execute($uuid);
+            return view('admin.users.update', [
+                'title' => 'Update User',
+                'user' => $response
+            ]);
+        } catch (Exception $e) {
+            return back()->with('error', $e->getMessage());
         }
-
-        $publications = $user->publications;
-        if($user->role === 'a') {
-            $publications = $user->reviewed_publications;
-        }
-
-        return view('admin.users.show_publications', [
-            'title' => 'User\'s Publications',
-            'user' => $user,
-            'publications' => $publications
-        ]);
     }
 
-    public function show_datasets($id)
+    public function update(Request $request, $uuid)
     {
-        $user = User::find($id);
-        if(!$user) {
-            return back()->with('error', 'User with id '. $id . ' not found');
+        try {
+            $this->updateUserUseCase->execute(new UpdateUserRequest(
+                $uuid,
+                $request->input('name'),
+                $request->input('email'),
+                $request->input('password'),
+                $request->input('telephone')
+            ));
+            return redirect('/admin/users');
+        } catch (Exception $e) {
+            return back()->with('error', $e->getMessage());
         }
-
-        $datasets = $user->datasets;
-        if($user->role === 'a') {
-            $datasets = $user->reviewed_datasets;
-        }
-
-        return view('admin.users.show_datasets', [
-            'title' => 'User\'s Datasets',
-            'user' => $user,
-            'datasets' => $datasets
-        ]);
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function edit($id)
+    public function destroy($uuid)
     {
-        $user = User::find($id);
-        if(!$user) {
-            return back()->with('error', 'User with id '. $id . ' not found');
+        try {
+            $this->deleteUserUseCase->execute($uuid);
+            return redirect('/admin/users');
+        } catch (Exception $e) {
+            return back()->with('error', $e->getMessage());
         }
-
-        return view('admin.users.update', [
-            'title' => 'Update User',
-            'user' => $user
-        ]);
     }
 
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function update(Request $request, $id)
-    {
-        $user = User::find($id);
-        if(!$user) {
-            return back()->with('error', 'user with id '. $id . ' not found');
-        }
+    // public function get_by_email(Request $request) {
+    //     if($request->keyword === '') {
+    //         return response()->json([], 200);
+    //     }
 
-        $validation_rules = [
-            'name' => 'required',
-            'email' => ['required', 'email:rfc,dns'],
-            'password' => [],
-            'telephone' => 'required|numeric',
-        ];
+    //     $users = User::where('role', '!=', 'a')->where('email', 'LIKE', '%' . $request->keyword . '%')->get();
 
-        // if email is different, then check if it is unique
-        if ($request->input('email') !== $user->email) {
-            $validation_rules['email'] = ['required', 'email:rfc,dns', 'unique:users'];
-        }
-
-        // if request has password, then validate
-        if ($request->input('password')) {
-            $validation_rules['password'] = ['min:6'];
-        }
-
-        $validated = $request->validate($validation_rules);
-
-        // if request has password, then hash, else delete password element
-        if ($validated['password']) {
-            $validated['password'] = Hash::make($validated['password']);
-        } else {
-            unset($validated['password']);
-        }
-
-        if(!User::where('id', $id)->update($validated)) {
-            return back()->with('error', 'Unable to update user "' . $validated['name'] . '"');
-        }
-        return redirect('/admin/users');
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function destroy($id)
-    {
-        $user = User::find($id);
-        if(!$user) {
-            return back()->with('error', 'User with id '. $id . ' not found');
-        }
-
-        User::destroy($id);
-
-        return redirect('/admin/users');
-    }
-
-    public function get_by_email(Request $request) {
-        if($request->keyword === '') {
-            return response()->json([], 200);
-        }
-
-        $users = User::where('role', '!=', 'a')->where('email', 'LIKE', '%' . $request->keyword . '%')->get();
-
-        return response()->json([
-            'users' => $users
-        ], 200);
-    }
+    //     return response()->json([
+    //         'users' => $users
+    //     ], 200);
+    // }
 }
