@@ -2,6 +2,40 @@
 
 namespace App\Providers;
 
+use App\Slices\Dataset\Domain\IDeleteDatasetAuthorCommand;
+use App\Slices\Dataset\Domain\IDeleteDatasetCommand;
+use App\Slices\Dataset\Domain\IDeleteDatasetTagCommand;
+use App\Slices\Dataset\Domain\IGetAllDatasetAuthorQuery;
+use App\Slices\Dataset\Domain\IGetAllDatasetQuery;
+use App\Slices\Dataset\Domain\IGetAllDatasetTagQuery;
+use App\Slices\Dataset\Domain\IGetByUuidDatasetQuery;
+use App\Slices\Dataset\Domain\IStoreDatasetAuthorCommand;
+use App\Slices\Dataset\Domain\IStoreDatasetCommand;
+use App\Slices\Dataset\Domain\IStoreDatasetTagCommand;
+use App\Slices\Dataset\Domain\IUpdateDatasetCommand;
+use App\Slices\Dataset\Repository\MySql\MySqlDeleteDatasetAuthorCommand;
+use App\Slices\Dataset\Repository\MySql\MySqlDeleteDatasetCommand;
+use App\Slices\Dataset\Repository\MySql\MySqlDeleteDatasetTagCommand;
+use App\Slices\Dataset\Repository\MySql\MySqlGetAllDatasetAuthorQuery;
+use App\Slices\Dataset\Repository\MySql\MySqlGetAllDatasetQuery;
+use App\Slices\Dataset\Repository\MySql\MySqlGetAllDatasetTagQuery;
+use App\Slices\Dataset\Repository\MySql\MySqlGetByUuidDatasetQuery;
+use App\Slices\Dataset\Repository\MySql\MySqlStoreDatasetAuthorCommand;
+use App\Slices\Dataset\Repository\MySql\MySqlStoreDatasetCommand;
+use App\Slices\Dataset\Repository\MySql\MySqlStoreDatasetTagCommand;
+use App\Slices\Dataset\Repository\MySql\MySqlUpdateDatasetCommand;
+use App\Slices\Dataset\UseCase\DeleteDatasetUseCase;
+use App\Slices\Dataset\UseCase\GetAllDatasetUseCase;
+use App\Slices\Dataset\UseCase\GetByUuidDatasetUseCase;
+use App\Slices\Dataset\UseCase\IDeleteDatasetUseCase;
+use App\Slices\Dataset\UseCase\IGetAllDatasetUseCase;
+use App\Slices\Dataset\UseCase\IGetByUuidDatasetUseCase;
+use App\Slices\Dataset\UseCase\IStoreDatasetUseCase;
+use App\Slices\Dataset\UseCase\IUpdateDatasetUseCase;
+use App\Slices\Dataset\UseCase\StoreDatasetUseCase;
+use App\Slices\Dataset\UseCase\UpdateDatasetUseCase;
+use App\Slices\DatasetReview\Domain\IGetAllDatasetReviewQuery;
+use App\Slices\DatasetReview\Repository\MySql\MySqlGetAllDatasetReviewQuery;
 use App\Slices\Publication\Domain\IDeletePublicationAuthorCommand;
 use App\Slices\Publication\Domain\IDeletePublicationCommand;
 use App\Slices\Publication\Domain\IDeletePublicationTagCommand;
@@ -106,6 +140,18 @@ class DependencyServiceProvider extends ServiceProvider
         $this->app->bind(IDeletePublicationAuthorCommand::class, MySqlDeletePublicationAuthorCommand::class);
         $this->app->bind(IDeletePublicationTagCommand::class, MySqlDeletePublicationTagCommand::class);
         $this->app->bind(IUpdatePublicationCommand::class, MySqlUpdatePublicationCommand::class);
+        $this->app->bind(IGetAllDatasetQuery::class, MySqlGetAllDatasetQuery::class);
+        $this->app->bind(IStoreDatasetCommand::class, MySqlStoreDatasetCommand::class);
+        $this->app->bind(IGetByUuidDatasetQuery::class, MySqlGetByUuidDatasetQuery::class);
+        $this->app->bind(IGetAllDatasetAuthorQuery::class, MySqlGetAllDatasetAuthorQuery::class);
+        $this->app->bind(IGetAllDatasetReviewQuery::class, MySqlGetAllDatasetReviewQuery::class);
+        $this->app->bind(IGetAllDatasetTagQuery::class, MySqlGetAllDatasetTagQuery::class);
+        $this->app->bind(IStoreDatasetAuthorCommand::class, MySqlStoreDatasetAuthorCommand::class);
+        $this->app->bind(IStoreDatasetTagCommand::class, MySqlStoreDatasetTagCommand::class);
+        $this->app->bind(IDeleteDatasetCommand::class, MySqlDeleteDatasetCommand::class);
+        $this->app->bind(IDeleteDatasetAuthorCommand::class, MySqlDeleteDatasetAuthorCommand::class);
+        $this->app->bind(IDeleteDatasetTagCommand::class, MySqlDeleteDatasetTagCommand::class);
+        $this->app->bind(IUpdateDatasetCommand::class, MySqlUpdateDatasetCommand::class);
 
 
         // Use Case
@@ -125,5 +171,10 @@ class DependencyServiceProvider extends ServiceProvider
         $this->app->bind(IGetByUuidPublicationUseCase::class, GetByUuidPublicationUseCase::class);
         $this->app->bind(IDeletePublicationUseCase::class, DeletePublicationUseCase::class);
         $this->app->bind(IUpdatePublicationUseCase::class, UpdatePublicationUseCase::class);
+        $this->app->bind(IGetAllDatasetUseCase::class, GetAllDatasetUseCase::class);
+        $this->app->bind(IStoreDatasetUseCase::class, StoreDatasetUseCase::class);
+        $this->app->bind(IGetByUuidDatasetUseCase::class, GetByUuidDatasetUseCase::class);
+        $this->app->bind(IDeleteDatasetUseCase::class, DeleteDatasetUseCase::class);
+        $this->app->bind(IUpdateDatasetUseCase::class, UpdateDatasetUseCase::class);
     }
 }

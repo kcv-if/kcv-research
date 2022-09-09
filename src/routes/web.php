@@ -40,7 +40,7 @@ Route::prefix('admin')->group(function () {
     Route::delete('/tags/{uuid}', [TagController::class, 'destroy']);
 
     // Tags search by name
-    // Route::post('/tags/search', [TagController::class, 'get_by_name'])->name('tags.search');
+    // Route::post('/tags/search', [TagController::class, 'getByName'])->name('tags.search');
 
     // Users
     Route::get('/users', [UserController::class, 'index']);
@@ -52,29 +52,30 @@ Route::prefix('admin')->group(function () {
     Route::delete('/users/{uuid}', [UserController::class, 'destroy']);
 
     // Users search by name
-    // Route::post('/users/search', [UserController::class, 'get_by_email'])->name('users.search');
+    // Route::post('/users/search', [UserController::class, 'getByEmail'])->name('users.search');
 
     // Publications
     Route::get('/publications', [PublicationController::class, 'index']);
     Route::get('/publications/create', [PublicationController::class, 'create']);
     Route::get('/publications/{uuid}', [PublicationController::class, 'show']);
     Route::get('/publications/{uuid}/edit', [PublicationController::class, 'edit']);
-    // Route::get('/publications/{uuid}/review', [PublicationController::class, 'create_review']);
-    // Route::post('/publications/{uuid}/review', [PublicationController::class, 'store_review']);
+    // Route::get('/publications/{uuid}/review', [PublicationController::class, 'createReview']);
+    // Route::post('/publications/{uuid}/review', [PublicationController::class, 'storeReview']);
     Route::post('/publications', [PublicationController::class, 'store']);
     Route::put('/publications/{uuid}', [PublicationController::class, 'update']);
     Route::delete('/publications/{uuid}', [PublicationController::class, 'destroy']);
 
     // Dataset
-    // Route::get('/datasets', [DatasetController::class, 'index']);
-    // Route::get('/datasets/create', [DatasetController::class, 'create']);
-    // Route::get('/datasets/{id}', [DatasetController::class, 'show']);
-    // Route::get('/datasets/{id}/edit', [DatasetController::class, 'edit']);
-    // Route::get('/datasets/{id}/review', [DatasetController::class, 'create_review']);
-    // Route::post('/datasets/{id}/review', [DatasetController::class, 'store_review']);
-    // Route::post('/datasets', [DatasetController::class, 'store']);
-    // Route::put('/datasets/{id}', [DatasetController::class, 'update']);
-    // Route::delete('/datasets/{id}', [DatasetController::class, 'destroy']);
+    Route::get('/datasets', [DatasetController::class, 'index']);
+    Route::get('/datasets/create', [DatasetController::class, 'create']);
+    Route::get('/datasets/{uuid}', [DatasetController::class, 'show']);
+    Route::get('/datasets/{uuid}/edit', [DatasetController::class, 'edit']);
+    // Route::get('/datasets/{uuid}/review', [DatasetController::class, 'createReview']);
+    // Route::post('/datasets/{uuid}/review', [DatasetController::class, 'storeReview']);
+    Route::post('/datasets', [DatasetController::class, 'store']);
+    Route::put('/datasets/{uuid}', [DatasetController::class, 'update']);
+    Route::delete('/datasets/{uuid}', [DatasetController::class, 'destroy']);
 });
 
+// TODO: this is only for demonstration, please delete later
 Route::redirect('/admin', '/admin/publications');
