@@ -58,12 +58,12 @@ Route::prefix('admin')->group(function () {
     Route::get('/publications', [PublicationController::class, 'index']);
     Route::get('/publications/create', [PublicationController::class, 'create']);
     Route::get('/publications/{uuid}', [PublicationController::class, 'show']);
-    // Route::get('/publications/{id}/edit', [PublicationController::class, 'edit']);
-    // Route::get('/publications/{id}/review', [PublicationController::class, 'create_review']);
-    // Route::post('/publications/{id}/review', [PublicationController::class, 'store_review']);
+    // Route::get('/publications/{uuid}/edit', [PublicationController::class, 'edit']);
+    // Route::get('/publications/{uuid}/review', [PublicationController::class, 'create_review']);
+    // Route::post('/publications/{uuid}/review', [PublicationController::class, 'store_review']);
     Route::post('/publications', [PublicationController::class, 'store']);
-    // Route::put('/publications/{id}', [PublicationController::class, 'update']);
-    // Route::delete('/publications/{id}', [PublicationController::class, 'destroy']);
+    // Route::put('/publications/{uuid}', [PublicationController::class, 'update']);
+    Route::delete('/publications/{uuid}', [PublicationController::class, 'destroy']);
 
     // Dataset
     // Route::get('/datasets', [DatasetController::class, 'index']);

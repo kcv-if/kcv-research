@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Slices\Publication\UseCase\IDeletePublicationUseCase;
 use App\Slices\Publication\UseCase\IGetAllPublicationUseCase;
 use App\Slices\Publication\UseCase\IGetByUuidPublicationUseCase;
 use App\Slices\Publication\UseCase\IStorePublicationUseCase;
@@ -14,7 +15,8 @@ class PublicationController extends Controller
     public function __construct(
         private IGetAllPublicationUseCase $getAllPublicationUseCase,
         private IStorePublicationUseCase $storePublicationUseCase,
-        private IGetByUuidPublicationUseCase $getByUuidPublicationUseCase
+        private IGetByUuidPublicationUseCase $getByUuidPublicationUseCase,
+        private IDeletePublicationUseCase $deletePublicationUseCase
     ) {
     }
 
@@ -192,19 +194,15 @@ class PublicationController extends Controller
     //     return redirect('/admin/publications');
     // }
 
-    // public function destroy($id)
-    // {
-    //     // check if publication exists
-    //     $publication = Publication::find($id);
-    //     if(!$publication) {
-    //         return back()->with('error', 'Publication with id '. $id . ' not found');
-    //     }
-
-    //     // delete publication
-    //     Publication::destroy($id);
-
-    //     return redirect('/admin/publications');
-    // }
+    public function destroy($uuid)
+    {
+        try {
+            $this->deletePublicationUseCase->execute($uuid);
+            return redirect('/admin/publications');
+        } catch (Exception $e) {
+            return back()->with('error', $e->getMessage());
+        }
+    }
 
     // public function create_review($id)
     // {

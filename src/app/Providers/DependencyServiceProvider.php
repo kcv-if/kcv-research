@@ -2,6 +2,7 @@
 
 namespace App\Providers;
 
+use App\Slices\Publication\Domain\IDeletePublicationCommand;
 use App\Slices\Publication\Domain\IGetAllPublicationAuthorQuery;
 use App\Slices\Publication\Domain\IGetAllPublicationQuery;
 use App\Slices\Publication\Domain\IGetAllPublicationTagQuery;
@@ -9,6 +10,7 @@ use App\Slices\Publication\Domain\IGetByUuidPublicationQuery;
 use App\Slices\Publication\Domain\IStorePublicationAuthorCommand;
 use App\Slices\Publication\Domain\IStorePublicationCommand;
 use App\Slices\Publication\Domain\IStorePublicationTagCommand;
+use App\Slices\Publication\Repository\MySql\MySqlDeletePublicationCommand;
 use App\Slices\Publication\Repository\MySql\MySqlGetAllPublicationAuthorQuery;
 use App\Slices\Publication\Repository\MySql\MySqlGetAllPublicationQuery;
 use App\Slices\Publication\Repository\MySql\MySqlGetAllPublicationTagQuery;
@@ -16,8 +18,10 @@ use App\Slices\Publication\Repository\MySql\MySqlGetByUuidPublicationQuery;
 use App\Slices\Publication\Repository\MySql\MySqlStorePublicationAuthorCommand;
 use App\Slices\Publication\Repository\MySql\MySqlStorePublicationCommand;
 use App\Slices\Publication\Repository\MySql\MySqlStorePublicationTagCommand;
+use App\Slices\Publication\UseCase\DeletePublicationUseCase;
 use App\Slices\Publication\UseCase\GetAllPublicationUseCase;
 use App\Slices\Publication\UseCase\GetByUuidPublicationUseCase;
+use App\Slices\Publication\UseCase\IDeletePublicationUseCase;
 use App\Slices\Publication\UseCase\IGetAllPublicationUseCase;
 use App\Slices\Publication\UseCase\IGetByUuidPublicationUseCase;
 use App\Slices\Publication\UseCase\IStorePublicationUseCase;
@@ -90,6 +94,7 @@ class DependencyServiceProvider extends ServiceProvider
         $this->app->bind(IGetAllPublicationTagQuery::class, MySqlGetAllPublicationTagQuery::class);
         $this->app->bind(IStorePublicationAuthorCommand::class, MySqlStorePublicationAuthorCommand::class);
         $this->app->bind(IStorePublicationTagCommand::class, MySqlStorePublicationTagCommand::class);
+        $this->app->bind(IDeletePublicationCommand::class, MySqlDeletePublicationCommand::class);
 
         // Use Case
 
@@ -106,5 +111,6 @@ class DependencyServiceProvider extends ServiceProvider
         $this->app->bind(IGetAllPublicationUseCase::class, GetAllPublicationUseCase::class);
         $this->app->bind(IStorePublicationUseCase::class, StorePublicationUseCase::class);
         $this->app->bind(IGetByUuidPublicationUseCase::class, GetByUuidPublicationUseCase::class);
+        $this->app->bind(IDeletePublicationUseCase::class, DeletePublicationUseCase::class);
     }
 }
