@@ -33,7 +33,7 @@ class TagController extends Controller
                 'tags' => $response
             ]);
         } catch (Exception $e) {
-            // TODO: add exception handling
+            return back()->with('error', $e->getMessage());
         }
     }
 

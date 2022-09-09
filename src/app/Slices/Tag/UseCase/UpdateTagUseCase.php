@@ -5,6 +5,7 @@ namespace App\Slices\Tag\UseCase;
 use App\Slices\Tag\Domain\IGetByUuidTagQuery;
 use App\Slices\Tag\Domain\IUpdateTagCommand;
 use App\Slices\Tag\Domain\UpdateTagCommandInput;
+use Carbon\Carbon;
 use Exception;
 
 class UpdateTagRequest
@@ -46,7 +47,8 @@ class UpdateTagUseCase implements IUpdateTagUseCase
         try {
             $this->updateTagCommand->execute(new UpdateTagCommandInput(
                 $row->id,
-                $request->name
+                $request->name,
+                Carbon::now()
             ));
         } catch (Exception $e) {
             throw new Exception("unable to update tag");

@@ -5,6 +5,7 @@ namespace App\Slices\User\UseCase;
 use App\Slices\User\Domain\IGetByUuidUserQuery;
 use App\Slices\User\Domain\IUpdateUserCommand;
 use App\Slices\User\Domain\UpdateUserCommandInput;
+use Carbon\Carbon;
 use Exception;
 use Illuminate\Support\Facades\Hash;
 
@@ -48,7 +49,6 @@ class UpdateUserUseCase implements IUpdateUserUseCase
         }
 
         try {
-            // TODO: add validation
             $password = $request->password;
 
             if (!$password) {
@@ -62,7 +62,8 @@ class UpdateUserUseCase implements IUpdateUserUseCase
                 $request->name,
                 $request->email,
                 $password,
-                $request->telephone
+                $request->telephone,
+                Carbon::now()
             ));
         } catch (Exception $e) {
             throw new Exception("unable to update user");

@@ -16,13 +16,15 @@ class MySqlUpdateUserCommand implements IUpdateUserCommand
                 name = ?,
                 email = ?,
                 password = ?,
-                telephone = ?
+                telephone = ?,
+                updated_at = ?
             WHERE id = ?",
             [
                 $input->name,
                 $input->email,
                 $input->password,
                 $input->telephone,
+                $input->updatedAt,
                 $input->id
             ]
         );

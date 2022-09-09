@@ -2,23 +2,26 @@
 
 namespace App\Slices\Publication\UseCase;
 
+use App\Slices\Publication\Domain\IDeletePublicationAuthorCommand;
+use App\Slices\Publication\Domain\IDeletePublicationTagCommand;
+use App\Slices\Publication\Domain\IGetAllPublicationAuthorQuery;
+use App\Slices\Publication\Domain\IGetAllPublicationTagQuery;
 use App\Slices\Publication\Domain\IGetByUuidPublicationQuery;
 use App\Slices\Publication\Domain\IStorePublicationAuthorCommand;
-use App\Slices\Publication\Domain\IStorePublicationCommand;
 use App\Slices\Publication\Domain\IStorePublicationTagCommand;
-use App\Slices\Publication\Domain\Publication;
+use App\Slices\Publication\Domain\IUpdatePublicationCommand;
 use App\Slices\Publication\Domain\StorePublicationAuthorCommandInput;
-use App\Slices\Publication\Domain\StorePublicationCommandInput;
 use App\Slices\Publication\Domain\StorePublicationTagCommandInput;
+use App\Slices\Publication\Domain\UpdatePublicationCommandInput;
 use App\Slices\Tag\Domain\IGetByUuidTagQuery;
 use App\Slices\User\Domain\IGetByUuidUserQuery;
 use Carbon\Carbon;
 use Exception;
-use Ramsey\Uuid\Uuid;
 
-class StorePublicationRequest
+class UpdatePublicationRequest
 {
     public function __construct(
+        public string $uuid,
         public string $name,
         public string $excerpt,
         public string $abstract,
@@ -30,25 +33,41 @@ class StorePublicationRequest
     }
 }
 
-interface IStorePublicationUseCase
+interface IUpdatePublicationUseCase
 {
-    public function execute(StorePublicationRequest $request): void;
+    public function execute(UpdatePublicationRequest $request): void;
 }
 
-class StorePublicationUseCase implements IStorePublicationUseCase
+class UpdatePublicationUseCase implements IUpdatePublicationUseCase
 {
     public function __construct(
-        private IStorePublicationCommand $storePublicationCommand,
+        private IGetByUuidPublicationQuery $getByUuidPublicationQuery,
         private IGetByUuidUserQuery $getByUuidUserQuery,
         private IGetByUuidTagQuery $getByUuidTagQuery,
-        private IGetByUuidPublicationQuery $getByUuidPublicationQuery,
+        private IUpdatePublicationCommand $updatePublicationCommand,
+        private IGetAllPublicationAuthorQuery $getAllPublicationAuthorQuery,
+        private IDeletePublicationAuthorCommand $deletePublicationAuthorCommand,
         private IStorePublicationAuthorCommand $storePublicationAuthorCommand,
-        private IStorePublicationTagCommand $storePublicationTagCommand
+        private IGetAllPublicationTagQuery $getAllPublicationTagQuery,
+        private IDeletePublicationTagCommand $deletePublicationTagCommand,
+        private IStorePublicationTagCommand $storePublicationTagCommand,
     ) {
     }
 
-    public function execute(StorePublicationRequest $request): void
+    public function execute(UpdatePublicationRequest $request): void
     {
+        $publicationRow = null;
+
+        try {
+            $publicationRow = $this->getByUuidPublicationQuery->execute($request->uuid);
+        } catch (Exception $e) {
+            throw new Exception("unable to get publication by uuid");
+        }
+
+        if (!$publicationRow->success) {
+            throw new Exception("publication not found");
+        }
+
         // check authors exist
         $authorRows = [];
         foreach ($request->authors as $author_uuid) {
@@ -83,46 +102,33 @@ class StorePublicationUseCase implements IStorePublicationUseCase
             }
         }
 
-        $uuid = Uuid::uuid4();
         try {
-            $publication = new Publication(
-                0,
-                $uuid,
+            $this->updatePublicationCommand->execute(new UpdatePublicationCommandInput(
+                $publicationRow->id,
                 $request->name,
                 $request->excerpt,
                 $request->abstract,
                 $request->downloadLink,
                 $request->status,
-                [],
-                [],
-                [],
-                [],
-                Carbon::now(),
-                null
-            );
-            $this->storePublicationCommand->execute(new StorePublicationCommandInput(
-                $publication->getUuid(),
-                $publication->getName(),
-                $publication->getExcerpt(),
-                $publication->getAbstract(),
-                $publication->getDownloadLink(),
-                $publication->getStatus(),
-                $publication->getCreatedAt()
+                Carbon::now()
             ));
         } catch (Exception $e) {
-            throw new Exception('unable to store publication');
+            throw new Exception("unable to update publication");
         }
 
-        $publicationRow = null;
-
+        // delete old authors
+        $oldAuthorRows = [];
         try {
-            $publicationRow = $this->getByUuidPublicationQuery->execute($uuid);
+            $oldAuthorRows = $this->getAllPublicationAuthorQuery->execute($publicationRow->id);
         } catch (Exception $e) {
-            throw new Exception("unable to get publication by uuid");
+            throw new Exception("unable to get all publication authors");
         }
-
-        if (!$publicationRow->success) {
-            throw new Exception("publication not found");
+        foreach ($oldAuthorRows as $ar) {
+            try {
+                $this->deletePublicationAuthorCommand->execute($publicationRow->id, $ar->id);
+            } catch (Exception $e) {
+                throw new Exception("unable to delete publication author");
+            }
         }
 
         // add authors
@@ -134,6 +140,21 @@ class StorePublicationUseCase implements IStorePublicationUseCase
                 ));
             } catch (Exception $e) {
                 throw new Exception("unable to store publication author");
+            }
+        }
+
+        // delete old tags
+        $oldTagRows = [];
+        try {
+            $oldTagRows = $this->getAllPublicationTagQuery->execute($publicationRow->id);
+        } catch (Exception $e) {
+            throw new Exception("unable to get all publication tags");
+        }
+        foreach ($oldTagRows as $tr) {
+            try {
+                $this->deletePublicationTagCommand->execute($publicationRow->id, $tr->id);
+            } catch (Exception $e) {
+                throw new Exception("unable to delete publication tag");
             }
         }
 

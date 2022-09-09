@@ -10,6 +10,17 @@ class MySqlUpdateTagCommand implements IUpdateTagCommand
 {
     public function execute(UpdateTagCommandInput $input): void
     {
-        DB::update("UPDATE tags SET name = ? WHERE id = ?", [$input->name, $input->id]);
+        DB::update(
+            "UPDATE tags
+            SET
+                name = ?,
+                updated_at = ?
+            WHERE id = ?",
+            [
+                $input->name,
+                $input->updatedAt,
+                $input->id
+            ]
+        );
     }
 }

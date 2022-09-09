@@ -37,8 +37,6 @@ class StoreUserUseCase implements IStoreUserUseCase
     public function execute(StoreUserRequest $request): void
     {
         try {
-            // TODO: check if email unique
-
             $user = new User(
                 id: 0,
                 uuid: Uuid::uuid4(),

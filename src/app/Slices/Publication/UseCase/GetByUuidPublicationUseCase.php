@@ -89,7 +89,12 @@ class GetByUuidPublicationUseCase implements IGetByUuidPublicationUseCase
             throw new Exception("publication not found");
         }
 
-        $authorRows = $this->getAllPublicationAuthorQuery->execute($row->id);
+        $authorRows = [];
+        try {
+            $authorRows = $this->getAllPublicationAuthorQuery->execute($row->id);
+        } catch (Exception $e) {
+            throw new Exception("unable to get all publication authors");
+        }
         $authors = [];
         foreach ($authorRows as $ar) {
             $authors[] = new GetByUuidPublicationResponseAuthorItem(
@@ -100,7 +105,12 @@ class GetByUuidPublicationUseCase implements IGetByUuidPublicationUseCase
             );
         }
 
-        $reviewRows = $this->getAllPublicationReviewQuery->execute($row->id);
+        $reviewRows = [];
+        try {
+            $reviewRows = $this->getAllPublicationReviewQuery->execute($row->id);
+        } catch (Exception $e) {
+            throw new Exception("unable to get all publication reviews");
+        }
         $reviews = [];
         foreach ($reviewRows as $rr) {
             $reviews[] = new GetByUuidPublicationResponseReviewItem(
@@ -113,7 +123,12 @@ class GetByUuidPublicationUseCase implements IGetByUuidPublicationUseCase
             );
         }
 
-        $tagRows = $this->getAllPublicationTagQuery->execute($row->id);
+        $tagRows = [];
+        try {
+            $tagRows = $this->getAllPublicationTagQuery->execute($row->id);
+        } catch (Exception $e) {
+            throw new Exception("unable to get all publication tags");
+        }
         $tags = [];
         foreach ($tagRows as $tr) {
             $tags[] = new GetByUuidPublicationResponseTagItem(

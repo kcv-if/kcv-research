@@ -2,6 +2,8 @@
 
 namespace App\Slices\User\Domain;
 
+use DateTime;
+
 class UpdateUserCommandInput
 {
     public function __construct(
@@ -9,7 +11,8 @@ class UpdateUserCommandInput
         public string $name,
         public string $email,
         public string $password,
-        public string $telephone
+        public string $telephone,
+        public DateTime $updatedAt
     ) {
     }
 }
