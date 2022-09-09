@@ -6,12 +6,16 @@ use App\Slices\Publication\Domain\IGetAllPublicationAuthorQuery;
 use App\Slices\Publication\Domain\IGetAllPublicationQuery;
 use App\Slices\Publication\Domain\IGetAllPublicationTagQuery;
 use App\Slices\Publication\Domain\IGetByUuidPublicationQuery;
+use App\Slices\Publication\Domain\IStorePublicationAuthorCommand;
 use App\Slices\Publication\Domain\IStorePublicationCommand;
+use App\Slices\Publication\Domain\IStorePublicationTagCommand;
 use App\Slices\Publication\Repository\MySql\MySqlGetAllPublicationAuthorQuery;
 use App\Slices\Publication\Repository\MySql\MySqlGetAllPublicationQuery;
 use App\Slices\Publication\Repository\MySql\MySqlGetAllPublicationTagQuery;
 use App\Slices\Publication\Repository\MySql\MySqlGetByUuidPublicationQuery;
+use App\Slices\Publication\Repository\MySql\MySqlStorePublicationAuthorCommand;
 use App\Slices\Publication\Repository\MySql\MySqlStorePublicationCommand;
+use App\Slices\Publication\Repository\MySql\MySqlStorePublicationTagCommand;
 use App\Slices\Publication\UseCase\GetAllPublicationUseCase;
 use App\Slices\Publication\UseCase\GetByUuidPublicationUseCase;
 use App\Slices\Publication\UseCase\IGetAllPublicationUseCase;
@@ -84,6 +88,8 @@ class DependencyServiceProvider extends ServiceProvider
         $this->app->bind(IGetAllPublicationAuthorQuery::class, MySqlGetAllPublicationAuthorQuery::class);
         $this->app->bind(IGetAllPublicationReviewQuery::class, MySqlGetAllPublicationReviewQuery::class);
         $this->app->bind(IGetAllPublicationTagQuery::class, MySqlGetAllPublicationTagQuery::class);
+        $this->app->bind(IStorePublicationAuthorCommand::class, MySqlStorePublicationAuthorCommand::class);
+        $this->app->bind(IStorePublicationTagCommand::class, MySqlStorePublicationTagCommand::class);
 
         // Use Case
 

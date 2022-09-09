@@ -40,6 +40,16 @@ class PublicationController extends Controller
 
     public function store(Request $request)
     {
+        // TODO: this is just a short term solution, please make this more proper
+        $tags = [];
+        if (trim($request->input('tags')) !== "") {
+            $tags = array_unique(explode(' ', $request->input('tags')));
+        }
+        $authors = [];
+        if (trim($request->input('authors')) !== "") {
+            $authors = array_unique(explode(' ', $request->input('authors')));
+        }
+
         try {
             $this->storePublicationUseCase->execute(new StorePublicationRequest(
                 $request->input('name'),
@@ -47,8 +57,8 @@ class PublicationController extends Controller
                 $request->input('abstract'),
                 $request->input('downloadLink'),
                 $request->input('status'),
-                array_unique(explode(' ', $request->input('tags'))),
-                array_unique(explode(' ', $request->input('authors')))
+                $tags,
+                $authors
             ));
             return redirect('/admin/publications');
         } catch (Exception $e) {
