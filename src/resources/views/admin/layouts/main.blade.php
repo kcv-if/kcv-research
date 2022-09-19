@@ -112,7 +112,6 @@
 
     .sidebar .nav-link {
       font-size: 14px;
-      font-weight: 600;
       color: #111827;
       padding: 0.7rem 0.7rem;
     }
@@ -123,9 +122,14 @@
     }
 
     .sidebar .nav-link.active {
+      font-weight: bolder;
+    }
+
+    .sidebar .nav-link.active,
+    .sidebar .nav-link:hover {
       background: #F3F4F6;
       border-radius: 5px;
-      font-weight: bold;
+      color: #111827;
     }
 
     .sidebar .nav-link:hover .feather,
