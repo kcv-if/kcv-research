@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en"><head>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Inter">
 <meta http-equiv="content-type" content="text/html; charset=UTF-8">
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -62,6 +63,12 @@
 
     body {
       font-size: .875rem;
+      font-family: "Inter", sans-serif;
+    }
+
+    .nav-item {
+      font-family: "Inter", sans-serif;
+      margin: 0.2rem;
     }
 
     .feather {
@@ -75,7 +82,7 @@
 
     .sidebar {
       position: fixed;
-      top: 0;
+      top: 10px;
       /* rtl:raw:
       right: 0;
       */
@@ -85,6 +92,7 @@
       z-index: 100; /* Behind the navbar */
       padding: 48px 0 0; /* Height of navbar */
       box-shadow: inset -1px 0 0 rgba(0, 0, 0, .1);
+      background-color: white;
     }
 
     @media (max-width: 767.98px) {
@@ -103,8 +111,10 @@
     }
 
     .sidebar .nav-link {
-      font-weight: 500;
-      color: #333;
+      font-size: 14px;
+      font-weight: 600;
+      color: #111827;
+      padding: 0.7rem 0.7rem;
     }
 
     .sidebar .nav-link .feather {
@@ -113,7 +123,9 @@
     }
 
     .sidebar .nav-link.active {
-      color: #2470dc;
+      background: #F3F4F6;
+      border-radius: 5px;
+      font-weight: bold;
     }
 
     .sidebar .nav-link:hover .feather,
@@ -162,10 +174,10 @@
   {{-- Bootstrap Icons --}}
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.8.3/font/bootstrap-icons.css">
 <body>
-  @include('admin.layouts.header')
   <div class="container-fluid">
     <div class="row">
       @include('admin.layouts.sidebar')
+      @include('admin.layouts.header')
 
       <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
         @if(session()->has('error'))
