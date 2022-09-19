@@ -2,8 +2,8 @@
   <div class="position-sticky pt-3">
     <ul class="nav flex-column">
       <li class="nav-item">
-        <a class="nav-link {{ Request::is('admin/publications*') ? 'active' : '' }}" href="{{ url('admin/publications') }}">
-          <i class="bi-house-fill"></i>
+        <a class="nav-link {{ Request::is('admin/dashboard*') ? 'active' : '' }}" href="{{ url('admin/dashboard') }}">
+          <i class="bi-house"></i>
           Dashboard
         </a>
       </li>
@@ -21,13 +21,13 @@
       </li>
       <li class="nav-item">
         <a class="nav-link {{ Request::is('admin/tags*') ? 'active' : '' }}" href="{{ url('admin/tags') }}">
-          <i class="bi-bookmarks-fill"></i>
+          <i class="bi-bookmarks"></i>
           Tags
         </a>
       </li>
       <li class="nav-item">
         <a class="nav-link {{ Request::is('admin/users*') ? 'active' : '' }}" href="{{ url('admin/users') }}">
-          <i class="bi-people-fill"></i>
+          <i class="bi-people"></i>
           Users
         </a>
       </li>

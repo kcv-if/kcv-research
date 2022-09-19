@@ -22,6 +22,10 @@ Route::get('/', function () {
 });
 
 Route::prefix('admin')->group(function () {
+    Route::get('/dashboard', function () {
+        return view('admin.dashboard.index', ['title' => 'Welcome to KCV Research ITS']);
+    });
+
     Route::get('/publications', function () {
         return view('admin.publications.index', ['title' => 'Publications']);
     });
@@ -78,4 +82,4 @@ Route::prefix('admin')->group(function () {
 });
 
 // TODO: this is only for demonstration, please delete later
-Route::redirect('/admin', '/admin/publications');
+Route::redirect('/admin', '/admin/dashboard');
